@@ -77,7 +77,7 @@ check_env_var('SOLR_HOST',"should include both host and port if needed.");
 
 my $atlasProdDir = $ENV{ "ATLAS_PROD" };
 my $bioentity_properties_annotations_ensembl=$ENV{'BIOENTITY_PROPERTIES_ENSEMBL'};
-my $bioentity_properties_annotations_wbps=$ENV{'BIOENTITY_PROPERTIES_WBPS'}
+my $bioentity_properties_annotations_wbps=$ENV{'BIOENTITY_PROPERTIES_WBPS'};
 
 # A hash to store some config for things we might want to change later, at the
 # top so it's easy to find.
