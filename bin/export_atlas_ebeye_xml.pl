@@ -72,7 +72,7 @@ sub check_env_var {
 check_env_var('ATLAS_PROD');
 check_env_var('BIOENTITY_PROPERTIES_ENSEMBL',"\$ATLAS_PROD/bioentity_properties/annotations/ensembl");
 check_env_var('BIOENTITY_PROPERTIES_WBPS',"\$ATLAS_PROD/bioentity_properties/annotations/wbps");
-check_env_var('BASELINE_SOLR_HOST',"should include both host and port if needed.");
+check_env_var('SOLR_HOST',"should include both host and port if needed.");
 
 
 my $atlasProdDir = $ENV{ "ATLAS_PROD" };
@@ -92,11 +92,9 @@ my $configHash = {
 	# URL for assay group details file.
 	assayGroupDetailsURL => "http://wwwdev.ebi.ac.uk/gxa/api/assaygroupsdetails.tsv",
 
-	# URL for baseline analytics from solr
-    baselineSolrURL => "http://".$ENV{'BASELINE_SOLR_HOST'}."/solr/analytics/export?omitHeader=true&fq=expression_level:[0.5+TO+*]&q=*:*&sort=bioentity_identifier+asc&fl=bioentity_identifier,experiment_accession,assay_group_id",
 
-    # URL for differential analytics from solr
-    differentialSolrURL => "http://".$ENV{'BASELINE_SOLR_HOST'}."/solr/analytics/export?omitHeader=true&fq=fold_change:([* TO +1.0] OR [1.0 TO *])+AND+p_value:[0 TO 0.05]&q=*:*&sort=bioentity_identifier+asc&fl=bioentity_identifier,experiment_accession,contrast_id",
+
+
 
 	# Directory where <species>.ensgene.tsv files are.
 	bioentityPropertiesEnsemblDir => File::Spec->catfile( $atlasProdDir, $bioentity_properties_annotations_ensembl ),
@@ -159,7 +157,13 @@ my $configHash = {
 # Build hashes like:
 #	 $H_geneIDs2expts2contrasts->{ <gene ID> }->{ <experiment accession> } = [ contrast1, contrast2, ... ]
 #	 $H_geneIDs2expts2assayGroups->{ <gene ID> }->{ <experiment accession> } = [ assayGroup1, assayGroup2, ... ]
-my ($H_geneIDs2expts2contrasts, $H_geneIDs2expts2assayGroups) = get_data_from_solr_db($configHash);
+
+# URL for baseline analytics from solr
+my $baselineSolrURL = "http://".$ENV{'SOLR_HOST'}."/solr/analytics/export?omitHeader=true&fq=expression_level:[0.5+TO+*]&q=*:*&sort=bioentity_identifier+asc&fl=bioentity_identifier,experiment_accession,assay_group_id";
+# URL for differential analytics from solr
+my $differentialSolrURL => "http://".$ENV{'SOLR_HOST'}."/solr/analytics/export?omitHeader=true&fq=fold_change:([* TO +1.0] OR [1.0 TO *])+AND+p_value:[0 TO 0.05]&q=*:*&sort=bioentity_identifier+asc&fl=bioentity_identifier,experiment_accession,contrast_id";
+
+my ($H_geneIDs2expts2contrasts, $H_geneIDs2expts2assayGroups) = get_data_from_solr_db($baselineSolrURL, $differentialSolrURL);
 
 
 # Get baseline and differential expression data from Atlas database and TSV
@@ -191,14 +195,9 @@ add_entry_count( $configHash );
 #		$H_geneIDs2expts2assayGroups->{ <IDENTIFIER> }->{ <EXPERIMENT> } = [ assaygroup1, assaygroup2, ... ]
 sub get_data_from_solr_db {
     # Ref to hash with config.
-    my ($configHash) = @_;
 
     ## query solr database to retrieve baseline and differential genes analytics
-    my ( $baseline_solr_url, $differential_solr_url );
-
-    $baseline_solr_url = $configHash->{ "baselineSolrURL" };
-    $differential_solr_url = $configHash->{ "differentialSolrURL" };
-
+    my ( $baseline_solr_url, $differential_solr_url ) = @_;
     # Run the queries to create two hashes, one for differential results and one for
     # baseline results.
     # $H_geneIDs2expts2contrasts->{ <IDENTIFIER> }->{ <EXPERIMENT> } = [ contrast1, contrast2, ... ]
@@ -243,18 +242,17 @@ sub fetch_baseline_genes_experiments_assaygroups_from_solrdb {
    my ($geneID, $expAcc, $assayGroupID);
    my $geneIDs2expAccs2assayGroupIDs = {};
 
- foreach my $hash_ref ( @{ $array_ref } ) {
-        $geneID = $hash_ref->{'bioentity_identifier'};
+   foreach my $hash_ref ( @{ $array_ref } ) {
+     $geneID = $hash_ref->{'bioentity_identifier'};
      $expAcc = $hash_ref->{'experiment_accession'};
-        $assayGroupID = $hash_ref->{'assay_group_id'};
+     $assayGroupID = $hash_ref->{'assay_group_id'};
 
-       unless( exists( $geneIDs2expAccs2assayGroupIDs->{ $geneID }->{ $expAcc } ) ) {
-
-            $geneIDs2expAccs2assayGroupIDs->{ $geneID }->{ $expAcc } = [ $assayGroupID ];
-         }
-  else {
-          push @{ $geneIDs2expAccs2assayGroupIDs->{ $geneID }->{ $expAcc } }, $assayGroupID;
-        }
+     unless( exists( $geneIDs2expAccs2assayGroupIDs->{ $geneID }->{ $expAcc } ) ) {
+       $geneIDs2expAccs2assayGroupIDs->{ $geneID }->{ $expAcc } = [ $assayGroupID ];
+     }
+     else {
+       push @{ $geneIDs2expAccs2assayGroupIDs->{ $geneID }->{ $expAcc } }, $assayGroupID;
+     }
     }
 
     $logger->info( "Baseline query from solr successful." );
