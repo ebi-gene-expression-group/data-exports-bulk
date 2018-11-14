@@ -39,7 +39,7 @@ listExperimentsToRetrieve(){
     IFS='; ' read -r -a exclude_exp <<< "$EXPERIMENTS_TO_EXCLUDE"
     printf "%s\n" "${exclude_exp[@]}" > experiments-exclude.tmp
     comm -23 \
-      <( psql $dbConnection -tA -F $'\t' <<< "select distinct e.accession from experiment_organism as eo join experiment as e on ( e.accession=eo.experiment) where eo.organism='Homo sapiens' and e.type like '%DIFFERENTIAL' and e.private='F' " \
+      <( psql $dbConnection -tA -F $'\t' <<< "select distinct accession from experiment where species='Homo sapiens' and type like '%DIFFERENTIAL' and private='F' " \
         | sort ) \
       <( cut -f1 -d ' ' "experiments-exclude.tmp" | sort)
 }
