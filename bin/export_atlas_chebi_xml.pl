@@ -52,7 +52,7 @@ my $allContrastDetails = get_atlas_contrast_details;
 my $chebiId2expAccs = get_chebi_experiment_accessions( $allContrastDetails );
 
 # Get the titles for those experiments from the Atlas database.
-$logger->info("Using database connection ".$CONFIG->get_AE_PG_DSN()." for ArrayExpress... (see ArrayExpressSiteConfig.yaml file)" )
+$logger->info("Using database connection ".$CONFIG->get_AE_PG_DSN()." for ArrayExpress... (see ArrayExpressSiteConfig.yaml file)." );
 my $expAcc2title = get_experiment_titles_from_db( $chebiId2expAccs );
 
 # Merge the hashes of ChEBI IDs and titles to create one hash mapping ChEBI IDs
