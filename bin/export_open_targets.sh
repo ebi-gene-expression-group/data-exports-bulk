@@ -1,8 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-[ ! -z ${dbConnection+x} ] || ( echo "Env var dbConnection for the atlas database." && exit 1 )
-
 scriptDir=$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 #defaults
@@ -39,8 +37,8 @@ listExperimentsToRetrieve(){
     IFS='; ' read -r -a exclude_exp <<< "$EXPERIMENTS_TO_EXCLUDE"
     printf "%s\n" "${exclude_exp[@]}" > experiments-exclude.tmp
     comm -23 \
-      <( psql $dbConnection -tA -F $'\t' <<< "select distinct accession from experiment where species='Homo sapiens' and type like '%DIFFERENTIAL' and private='F' " \
-        | sort ) \
+      <( curl -s $atlasUrl/json/experiments | jq -c -r '.aaData | map(select(.species=="Homo sapiens")) | map(select(.experimentType | test("(MICROARRAY)|(DIFFERENTIAL)"; "i")) |.experimentAccession) | @csv' | tr -s ',' '\n' | sed 's/"//g' \
+        | sort -u ) \
       <( cut -f1 -d ' ' "experiments-exclude.tmp" | sort)
 }
 
