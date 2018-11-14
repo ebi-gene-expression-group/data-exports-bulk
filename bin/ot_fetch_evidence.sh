@@ -41,6 +41,6 @@ fi
 >&2 echo "Retrieving experiment $experimentAccession ... "
 >&1 curl -w "\n" "$atlasUrl/json/experiments/$experimentAccession/evidence?$urlParams" \
     | grep -v -e '^[[:space:]]*$' \
-    | "$( dirname "${BASH_SOURCE[0]}" )"/json_schema_validator.pl \
+    | "$( dirname "${BASH_SOURCE[0]}" )"/ot_json_schema_validator.pl \
       --schema='https://raw.githubusercontent.com/opentargets/json_schema/master/src/expression.json' \
       --add-validation-stamp
