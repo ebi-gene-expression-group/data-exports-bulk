@@ -5,7 +5,7 @@ scriptDir=$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 atlasUrl=${atlasUrl:-"https://wwwdev.ebi.ac.uk/gxa"}
 
 [ ! -z ${lastReleaseDate+x} ] || ( echo "Env var lastReleaseDate as DDMonYYYY needs to be defined. " && exit 1 )
-[ ! -z ${lastReleaseDate+x} ] || ( echo "Env var lastReleaseDate as DDMonYYYY needs to be defined. " && exit 1 )
+[ ! -z ${ATLAS_EXPS+x} ] || ( echo "Env var ATLAS_EXPS needs to be defined. " && exit 1 )
 
 # Get mapping between Atlas experiments and Ensembl DBs that own their species
 get_experiments_loaded_since_date() {
