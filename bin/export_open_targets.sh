@@ -55,6 +55,7 @@ installValidator(){
 }
 
 installValidator
+source $venvPath/ot-validator/bin/activate
 
 set -euo pipefail
 
@@ -64,7 +65,6 @@ touch ${destination}.tmp
 
 trap 'mv -fv ${destination}.tmp ${destination}.failed; exit 1' INT TERM EXIT
 
-source $venvPath/ot-validator/bin/activate
 listExperimentsToRetrieve | while read -r experimentAccession ; do
   >&2 echo "Retrieving experiment $experimentAccession ... "
   >&1 curl -s -w "\n" "$atlasUrl/json/experiments/$experimentAccession/evidence?$urlParams" \
@@ -76,7 +76,9 @@ done
 rm -rf experiments-exclude.tmp
 
 # closes virtualenv
+set +eu
 deactivate
+set -eu
 
 trap - INT TERM EXIT
 
