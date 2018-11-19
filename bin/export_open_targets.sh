@@ -57,7 +57,6 @@ installValidator(){
 installValidator
 source $venvPath/ot-validator/bin/activate
 
-set -euo pipefail
 
 rm -rf ${destination}.tmp
 touch ${destination}.tmp
@@ -67,17 +66,20 @@ trap 'mv -fv ${destination}.tmp ${destination}.failed; exit 1' INT TERM EXIT
 
 listExperimentsToRetrieve | while read -r experimentAccession ; do
   echo "Retrieving experiment $experimentAccession ... "
-  curl -s -w "\n" "$atlasUrl/json/experiments/$experimentAccession/evidence?$urlParams" \
-      | grep -v -e '^[[:space:]]*$' \
-      | opentargets_validator \
-         --schema https://raw.githubusercontent.com/opentargets/json_schema/1.3.0/src/expression.json >> ${destination}.tmp
+  curl -s -w "\n" "$atlasUrl/json/experiments/$experimentAccession/evidence?$urlParams" | grep -v -e '^[[:space:]]*$' > $experimentAccession.tmp.json
+  opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/1.3.0/src/expression.json $experimentAccession.tmp.json
+  if [ "$?" -eq 0 ]; then
+    cat $experimentAccession.tmp.json >> ${destination}.tmp
+    rm $experimentAccession.tmp.json
+  else
+    echo "$experimentAccession failed validation."
+    exit 1
+  fi
 done
 rm -rf experiments-exclude.tmp
 
 # closes virtualenv
-set +eu
 deactivate
-set -eu
 
 trap - INT TERM EXIT
 
