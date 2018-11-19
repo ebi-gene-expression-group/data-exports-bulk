@@ -43,15 +43,18 @@ listExperimentsToRetrieve(){
       <( cut -f1 -d ' ' "experiments-exclude.tmp" | sort)
 }
 
-installValidator() {
+installValidator(){
+  set +e
   if [ ! -f $venvPath/ot-validator/bin/activate ]; then
     mkdir -p $venvPath
     virtualenv $venvPath/ot-validator
   fi
   source $venvPath/ot-validator/bin/activate
+  set -e
   pip install --upgrade pip==18.1
   pip install --upgrade setuptools==40.6.2
   pip install opentargets-validator==0.3.0
+  deactivate
 }
 
 rm -rf ${destination}.tmp
@@ -61,6 +64,7 @@ installValidator
 
 trap 'mv -fv ${destination}.tmp ${destination}.failed; exit 1' INT TERM EXIT
 
+source $venvPath/ot-validator/bin/activate
 listExperimentsToRetrieve | while read -r experimentAccession ; do
   >&2 echo "Retrieving experiment $experimentAccession ... "
   >&1 curl -s -w "\n" "$atlasUrl/json/experiments/$experimentAccession/evidence?$urlParams" \
