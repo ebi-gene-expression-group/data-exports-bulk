@@ -8,6 +8,7 @@ atlasUrl=${atlasUrl:-"https://wwwdev.ebi.ac.uk/gxa"}
 urlParams=${urlParams:-"logFoldChangeCutoff=1.0&pValueCutoff=0.05&maxGenesPerContrast=1000"}
 destination=${destination:-"$ATLAS_FTP/experiments/cttv010-$(date "+%Y-%m-%d").json"}
 usageMessage="Usage: (-a $atlasUrl) (-p urlParams:$urlParams) (-d destination:$destination) (-o outputPath:outputPath)"
+venvPath=${venvPath:-"$ATLAS_PROD/venvs"}
 
 echo "To exclude experiments for open-targets, export env var EXPERIMENTS_TO_EXCLUDE=ACC1;...;ACCi;..ACCn"
 
@@ -42,15 +43,32 @@ listExperimentsToRetrieve(){
       <( cut -f1 -d ' ' "experiments-exclude.tmp" | sort)
 }
 
+installValidator() {
+  mkdir -p $venvPath
+  virtualenv $venvPath/ot-validator
+  source $venvPath/ot-validator/bin/activate
+  pip install opentargets-validator==0.3.0
+}
+
 rm -rf ${destination}.tmp
 touch ${destination}.tmp
+
+installValidator
 
 trap 'mv -fv ${destination}.tmp ${destination}.failed; exit 1' INT TERM EXIT
 
 listExperimentsToRetrieve | while read -r experimentAccession ; do
-    "$scriptDir/ot_fetch_evidence.sh" -e $experimentAccession -a $atlasUrl -p $urlParams >> ${destination}.tmp
+  >&2 echo "Retrieving experiment $experimentAccession ... "
+  >&1 curl -s -w "\n" "$atlasUrl/json/experiments/$experimentAccession/evidence?$urlParams" \
+      | grep -v -e '^[[:space:]]*$' \
+      | opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/1.3.0/src/expression.json \
+        --schema='https://raw.githubusercontent.com/opentargets/json_schema/master/src/expression.json' \
+        --add-validation-stamp >> ${destination}.tmp
 done
 rm -rf experiments-exclude.tmp
+
+# closes virtualenv
+deactivate
 
 trap - INT TERM EXIT
 
