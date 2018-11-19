@@ -69,9 +69,8 @@ listExperimentsToRetrieve | while read -r experimentAccession ; do
   >&2 echo "Retrieving experiment $experimentAccession ... "
   >&1 curl -s -w "\n" "$atlasUrl/json/experiments/$experimentAccession/evidence?$urlParams" \
       | grep -v -e '^[[:space:]]*$' \
-      | opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/1.3.0/src/expression.json \
-        --schema='https://raw.githubusercontent.com/opentargets/json_schema/master/src/expression.json' \
-        --add-validation-stamp >> ${destination}.tmp
+      | opentargets_validator \
+         --schema https://raw.githubusercontent.com/opentargets/json_schema/1.3.0/src/expression.json >> ${destination}.tmp
 done
 rm -rf experiments-exclude.tmp
 
