@@ -1,5 +1,4 @@
 #!/bin/bash
-set -euo pipefail
 
 scriptDir=$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
@@ -44,23 +43,24 @@ listExperimentsToRetrieve(){
 }
 
 installValidator(){
-  set +e
   if [ ! -f $venvPath/ot-validator/bin/activate ]; then
     mkdir -p $venvPath
     virtualenv $venvPath/ot-validator
   fi
   source $venvPath/ot-validator/bin/activate
-  set -e
   pip install --upgrade pip==18.1
   pip install --upgrade setuptools==40.6.2
   pip install opentargets-validator==0.3.0
   deactivate
 }
 
+installValidator
+
+set -euo pipefail
+
 rm -rf ${destination}.tmp
 touch ${destination}.tmp
 
-installValidator
 
 trap 'mv -fv ${destination}.tmp ${destination}.failed; exit 1' INT TERM EXIT
 
