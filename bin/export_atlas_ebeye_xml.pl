@@ -97,10 +97,10 @@ my $configHash = {
 
 
 	# Directory where <species>.ensgene.tsv files are.
-	bioentityPropertiesEnsemblDir => File::Spec->catfile( $atlasProdDir, $bioentity_properties_annotations_ensembl ),
+	bioentityPropertiesEnsemblDir => $bioentity_properties_annotations_ensembl,
 
     # Directory where <species>.wbpsgene.tsv files are.
-    bioentityPropertiesWBPSDir => File::Spec->catfile( $atlasProdDir, $bioentity_properties_annotations_wbps ),
+  bioentityPropertiesWBPSDir => $bioentity_properties_annotations_wbps,
 
 	# Filename for differential Atlas data.
 	differentialDataFilename => "ebeye_differential_genes_export.xml",
