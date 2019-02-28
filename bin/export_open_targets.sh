@@ -67,7 +67,7 @@ trap 'mv -fv ${destination}.tmp ${destination}.failed; exit 1' INT TERM EXIT
 listExperimentsToRetrieve | while read -r experimentAccession ; do
   echo "Retrieving experiment $experimentAccession ... "
   curl -s -w "\n" "$atlasUrl/json/experiments/$experimentAccession/evidence?$urlParams" | grep -v -e '^[[:space:]]*$' > $experimentAccession.tmp.json
-  opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/1.3.0/src/expression.json $experimentAccession.tmp.json 2>$experimentAccession.err
+  opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/master/opentargets.json $experimentAccession.tmp.json 2>$experimentAccession.err
   if [ $(wc -l < $experimentAccession.err) -eq 0 ]; then
     cat $experimentAccession.tmp.json >> ${destination}.tmp
     rm $experimentAccession.tmp.json
