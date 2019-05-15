@@ -50,7 +50,7 @@ installValidator(){
   source $venvPath/ot-validator/bin/activate
   pip install --upgrade pip==18.1
   pip install --upgrade setuptools==40.6.2
-  pip install opentargets-validator==0.3.0
+  pip install opentargets-validator==0.4.0
   deactivate
 }
 
