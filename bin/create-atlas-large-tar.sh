@@ -31,7 +31,7 @@ gunzip atlas-latest-data.tar.gz
 # Identify all experiments removed since $lastReleaseDate
 tar -tvf atlas-latest-data.tar | grep '/$' | sed 's|\/$||' | awk '{print $NF}' | sort | uniq > $aux.exps_in_release_$lastReleaseDate
 ls -la | grep E- | egrep -v 'rwxr-x-' | awk '{print $NF}' | sort > $aux.all_current_experiments
-comm -3 $aux.exps_in_release_$lastReleaseDate $aux.all_current_experiments | grep -oe 'E-[[:upper:]]*-[[:digit:]]*' > $aux.exps_removed_since_last_release
+comm -23 $aux.exps_in_release_$lastReleaseDate $aux.all_current_experiments | grep -oe 'E-[[:upper:]]*-[[:digit:]]*' > $aux.exps_removed_since_last_release
 # First remove from atlas-latest-data.tar all experiments in $aux.exps_removed_since_last_release
 for e in $(cat $aux.exps_removed_since_last_release); do
     echo "Removing $e ..."
