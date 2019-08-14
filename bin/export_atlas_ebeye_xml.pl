@@ -159,9 +159,9 @@ my $configHash = {
 #	 $H_geneIDs2expts2assayGroups->{ <gene ID> }->{ <experiment accession> } = [ assayGroup1, assayGroup2, ... ]
 
 # URL for baseline analytics from solr
-my $baselineSolrURL = "http://".$ENV{'SOLR_HOST'}."/solr/analytics/export?omitHeader=true&fq=expression_level:[0.5+TO+*]&q=*:*&sort=bioentity_identifier+asc&fl=bioentity_identifier,experiment_accession,assay_group_id";
+my $baselineSolrURL = "http://".$ENV{'SOLR_HOST'}."/solr/bulk-analytics-v1/export?omitHeader=true&fq=expression_level:[0.5+TO+*]&q=*:*&sort=bioentity_identifier+asc&fl=bioentity_identifier,experiment_accession,assay_group_id";
 # URL for differential analytics from solr
-my $differentialSolrURL = "http://".$ENV{'SOLR_HOST'}."/solr/analytics/export?omitHeader=true&fq=fold_change:([* TO +1.0] OR [1.0 TO *])+AND+p_value:[0 TO 0.05]&q=*:*&sort=bioentity_identifier+asc&fl=bioentity_identifier,experiment_accession,contrast_id";
+my $differentialSolrURL = "http://".$ENV{'SOLR_HOST'}."/solr/bulk-analytics-v1/export?omitHeader=true&fq=fold_change:([* TO +1.0] OR [1.0 TO *])+AND+p_value:[0 TO 0.05]&q=*:*&sort=bioentity_identifier+asc&fl=bioentity_identifier,experiment_accession,contrast_id";
 
 my ($H_geneIDs2expts2contrasts, $H_geneIDs2expts2assayGroups) = get_data_from_solr_db($baselineSolrURL, $differentialSolrURL);
 
