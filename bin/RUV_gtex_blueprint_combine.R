@@ -3,7 +3,7 @@
 # Author: Suhaib Mohammed
 
 suppressMessages( library(RUVSeq) )
-
+setwd( system.getCurrentDirectory() )
 
 # Get commandline arguments.
 args <- commandArgs( TRUE )

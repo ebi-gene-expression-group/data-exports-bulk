@@ -3,6 +3,7 @@
 # Author: Suhaib Mohammed
 
 suppressMessages( library( ExpressionAtlas) )
+setwd( system.getCurrentDirectory() )
 
 ## loading generic functions 
 source("generic_functions.R")

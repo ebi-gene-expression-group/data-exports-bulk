@@ -5,6 +5,7 @@
  ## parse study_list as `echo -e "E-MTAB-5214"'\t'"E-MTAB-513"'\t'"E-MTAB-2836"`
 
 suppressMessages( library( ExpressionAtlas) )
+setwd( system.getCurrentDirectory() )
 
 ## loading generic functions 
 source("generic_functions.R")
