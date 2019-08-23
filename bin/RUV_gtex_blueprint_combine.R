@@ -3,7 +3,12 @@
 # Author: Suhaib Mohammed
 
 suppressMessages( library(RUVSeq) )
-setwd( system.getCurrentDirectory() )
+suppressMessages( library( funr) )
+
+script_path<-funr::get_script_path()
+
+## loading generic functions 
+source(paste(script_path,"generic_functions.R",sep="/"))
 
 # Get commandline arguments.
 args <- commandArgs( TRUE )
@@ -18,9 +23,6 @@ output_path <- args[ 1 ]
 ##load expressioinSet objects 
 load(paste(output_path,"gtex","set.RUVg_gtex.Rdata",sep="/")
 load(paste(output_path,"blueprint","set.RUVg_bp.Rdata",sep="/")
-
-## loading generic functions 
-source("generic_functions.R")
 
 ## extracting normalised counts 
 norm.Gtex<-normCounts(set.RUVg)

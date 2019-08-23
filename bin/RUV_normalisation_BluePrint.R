@@ -3,10 +3,12 @@
 # Author: Suhaib Mohammed
 
 suppressMessages( library( ExpressionAtlas) )
-setwd( system.getCurrentDirectory() )
+suppressMessages( library( funr) )
+
+script_path<-funr::get_script_path()
 
 ## loading generic functions 
-source("generic_functions.R")
+source(paste(script_path,"generic_functions.R",sep="/"))
 
 # Get commandline arguments.
 args <- commandArgs( TRUE )

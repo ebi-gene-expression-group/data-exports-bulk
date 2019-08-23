@@ -5,10 +5,12 @@
  ## parse study_list as `echo -e "E-MTAB-5214"'\t'"E-MTAB-513"'\t'"E-MTAB-2836"`
 
 suppressMessages( library( ExpressionAtlas) )
-setwd( system.getCurrentDirectory() )
+suppressMessages( library( funr) )
+
+script_path<-funr::get_script_path()
 
 ## loading generic functions 
-source("generic_functions.R")
+source(paste(script_path,"generic_functions.R",sep="/"))
 
 # Get commandline arguments.
 args <- commandArgs( TRUE )
