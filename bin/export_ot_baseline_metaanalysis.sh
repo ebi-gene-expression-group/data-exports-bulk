@@ -9,28 +9,29 @@ scriptDir=$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 
 export outpath_path=${BASELINE_META_DESTINATION}/output_$(date "+%Y-%m-%d")
+mkdir -p "$outpath_path"
 
 # Set path (this is done at this level since this will be executed directly):
-for mod in data-exports-bulk; do
+for mod in data-exports-bulk/bin; do
     export PATH=$ATLASPROD_PATH/$mod:$PATH
 done
 
 ## Run the normalisation and batch correction of gtex and associated studies
-RUV_normalisation_gtex.R $GTEX_STUDIES $outpath_path
+RUV_normalisation_gtex.R "$GTEX_STUDIES" "$outpath_path"
 if [ $? -ne 0 ]; then
     echo "ERROR: Failed to normalise Gtex associated studies"
     exit 1
 fi
 
 ## Run the normalisation and batch correction of blueprint studies
- RUV_normalisation_BluePrint.R $BLUEPRINT_STUDIES $outpath_path
+RUV_normalisation_BluePrint.R "$BLUEPRINT_STUDIES" "$outpath_path"
 if [ $? -ne 0 ]; then
     echo "ERROR: Failed to normlalise blueprint associated studies"
     exit 1
 fi
 
 ## combine corrected gtex and blueorint
-RUV_gtex_blueprint_combine.R $outpath_path
+RUV_gtex_blueprint_combine.R "$outpath_path"
 if [ $? -ne 0 ]; then
     echo "ERROR: Failed to combine studies"
     exit 1

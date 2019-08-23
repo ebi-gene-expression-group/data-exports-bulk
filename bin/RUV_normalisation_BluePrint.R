@@ -46,7 +46,7 @@ dim(all)
 all_blueprint<-all
 
 dir.create(paste(output_path,"blueprint",sep="/"))
-save(all_blueprint,file=paste(output_path,"blueprint","all_blueprint.Rda",sep="/")
+save(all_blueprint,file=paste(output_path,"blueprint","all_blueprint.Rda",sep="/"))
 
 ## filtering lower signals
 filter <- rowSums(all>10)>=5
@@ -129,7 +129,7 @@ for ( object in ls() ){
 
 #####
 set.RUVg.bp <- RUVg(set, leastVar.genes[1:1000] , k=1)
-save(set.RUVg.bp,file=paste(output_path,"blueprint","set.RUVg_bp.Rdata",sep="/")
+save(set.RUVg.bp,file=paste(output_path,"blueprint","set.RUVg_bp.Rdata",sep="/"))
 pdf(paste(output_path,"blueprint","RUVgK1.1000_blueprint.pdf",sep="/"), width=18, height=18)
 plotRLE(set.RUVg.bp, outline=FALSE, ylim=c(-4, 4), col=colors.order)
 abline(h=c(2,-2),lty=2, col="blue",lwd=2)
