@@ -2,7 +2,7 @@
 
 scriptDir=$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-
+[ ! -z ${ATLASPROD_PATH+x} ] || ( echo "Env var ATLASPROD_PATH path to the directory needs to be defined." && exit 1 )
 [ ! -z ${BASELINE_META_DESTINATION+x} ] || ( echo "Env var BASELINE_META_DESTINATION path to the baseline baseline meta analysis directory needs to be defined." && exit 1 )
 [ ! -z ${BLUEPRINT_STUDIES+x} ] || ( echo "Env var BLUEPRINT_STUDIES comma separated blueprint baseline studies needs to be defined." && exit 1 )
 [ ! -z ${GTEX_STUDIES+x} ] || ( echo "Env var GTEX_STUDIES comma separated gtex baseline studies needs to be defined." && exit 1 )
