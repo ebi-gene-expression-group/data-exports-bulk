@@ -3,7 +3,7 @@
 # Author: Suhaib Mohammed
 
 suppressMessages( library(RUVSeq) )
-suppressMessages( library( funr) )
+suppressMessages( library(funr) )
 
 script_path<-funr::get_script_path()
 
@@ -21,8 +21,8 @@ if( length( args ) != 1 ) {
 output_path <- args[ 1 ]
 
 ##load expressioinSet objects 
-load(paste(output_path,"gtex","set.RUVg_gtex.Rdata",sep="/")
-load(paste(output_path,"blueprint","set.RUVg_bp.Rdata",sep="/")
+load(paste(output_path,"gtex","set.RUVg_gtex.Rdata",sep="/"))
+load(paste(output_path,"blueprint","set.RUVg_bp.Rdata",sep="/"))
 
 ## extracting normalised counts 
 norm.Gtex<-normCounts(set.RUVg)
@@ -49,7 +49,7 @@ tissue.names<-sapply(strsplit(colnames(expData),split="_"),"[",2)
 colnames(expData) <- tissue.names
 expData <- t(apply(expData, 1, function(x) tapply(x, colnames(expData), median)))
 
-png(file = paste0("heatmap",".png"), width = 2000, height = 2000, res=180)
+png(file = paste(output_path,"heatmap.png",sep="/"), width = 2000, height = 2000, res=180)
 plot_heatmap(expData, name="normalised")
 dev.off()
 

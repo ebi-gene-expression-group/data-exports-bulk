@@ -49,7 +49,6 @@ dim(all)
 x<-sapply(strsplit(colnames(all),split="_"),"[",3)
 
 dir.create(paste(output_path,"gtex",sep="/"))
-save(all,x,file=paste(output_path,"gtex","all_gtex.RData",sep="/"))
 
 ## filtering low expression signals
   filter <- rowSums(all>10)>=15
@@ -114,7 +113,6 @@ dev.off()
 
 ## upper quartile normalisation
 set <- betweenLaneNormalization(set, which="upper")
-save(set, file=paste(output_path,"gtex","upperqNorm2K_gtex.RData",sep="/"))
 pdf(paste(output_path,"gtex","upperQnormalisation_gtex.pdf",sep="/"), width=18, height=18)
 plotRLE(set, outline=FALSE, ylim=c(-4, 4), col=colors.order)
 abline(h=c(2,-2),lty=2, col="blue",lwd=2)

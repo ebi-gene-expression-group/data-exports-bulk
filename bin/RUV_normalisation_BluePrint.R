@@ -3,7 +3,7 @@
 # Author: Suhaib Mohammed
 
 suppressMessages( library( ExpressionAtlas) )
-suppressMessages( library( funr) )
+suppressMessages( library( funr ) )
 
 script_path<-funr::get_script_path()
 
@@ -46,7 +46,6 @@ dim(all)
 all_blueprint<-all
 
 dir.create(paste(output_path,"blueprint",sep="/"))
-save(all_blueprint,file=paste(output_path,"blueprint","all_blueprint.Rda",sep="/"))
 
 ## filtering lower signals
 filter <- rowSums(all>10)>=5
@@ -114,7 +113,6 @@ plotPCA(set, col=colors.order, cex=0.7)
 dev.off()
 
 set <- betweenLaneNormalization(set, which="upper")
-save(set, file=paste(output_path,"blueprint","upperqNorm2K.RData",sep="/"))
 pdf(paste(output_path,"blueprint","upperQnormalisation_allBluePrint.pdf",sep="/"), width=18, height=18)
 plotRLE(set, outline=FALSE, ylim=c(-4, 4), col=colors.order)
 abline(h=c(2,-2),lty=2, col="blue",lwd=2)
