@@ -94,7 +94,6 @@ dev.off()
 
 ##
 library(EDASeq)
-library(EDASeq)
 library(ggplot2)
 library(ggfortify)
 library(RUVSeq)
