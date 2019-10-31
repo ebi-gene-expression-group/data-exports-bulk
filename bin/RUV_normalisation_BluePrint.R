@@ -2,13 +2,13 @@
 
 # Author: Suhaib Mohammed
 
-suppressMessages( library( ExpressionAtlas) )
 suppressMessages( library( funr ) )
 
 script_path<-funr::get_script_path()
 
 ## loading generic functions 
 source(paste(script_path,"generic_functions.R",sep="/"))
+source(paste(script_path,"get_data_from_staging.R",sep="/"))
 
 # Get commandline arguments.
 args <- commandArgs( TRUE )
