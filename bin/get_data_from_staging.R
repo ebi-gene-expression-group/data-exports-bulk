@@ -1,5 +1,8 @@
 #!/usr/bin/env Rscript
   
+  suppressMessages( library(  S4Vectors ) )
+  suppressMessages( library(  SummarizedExperiment ) )
+
   # getAtlasExperiment
   #   - Download and return the SimpleList object representing a single
   #   Expression Atlas experiment.

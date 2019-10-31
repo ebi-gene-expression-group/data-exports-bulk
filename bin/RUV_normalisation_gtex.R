@@ -43,7 +43,7 @@ for (i in names(t)) {
 }
 
 ## sanity check 
-head(all)
+colnames(all)
 dim(all)
 
 x<-sapply(strsplit(colnames(all),split="_"),"[",3)

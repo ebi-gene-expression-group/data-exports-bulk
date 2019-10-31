@@ -40,7 +40,7 @@ for (i in names(t)) {
 }
 
 ## sanity check 
-head(all)
+colnames(all)
 dim(all)
 
 all_blueprint<-all
