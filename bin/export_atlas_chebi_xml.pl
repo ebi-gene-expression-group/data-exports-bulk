@@ -12,6 +12,12 @@ use URI::Split qw(
 	uri_split
 );
 use DateTime;
+use JSON::Parse qw( parse_json );
+use Encode qw(
+    encode
+    decode
+);
+use Data::Dumper;
 
 # Atlas common subroutines.
 use Atlas::Common qw(
@@ -50,23 +56,23 @@ my $allContrastDetails = get_atlas_contrast_details;
 # Get all the ChEBI IDs used in Atlas contrasts, and the associated experiment
 # accessions.
 my $chebiId2expAccs = get_chebi_experiment_accessions( $allContrastDetails );
+print Dumper(%{ $chebiId2expAccs });
 
-# Get the titles for those experiments from the Atlas database.
-$logger->info("Using database connection ".$CONFIG->get_AE_PG_DSN()." for ArrayExpress... (see ArrayExpressSiteConfig.yaml file)." );
-my $expAcc2title = get_experiment_titles_from_db( $chebiId2expAccs );
+# Get the titles for those experiments from the Atlas Web API.
+my $expAcc2title = get_experiment_titles_from_webapi( $chebiId2expAccs );
 
 # Merge the hashes of ChEBI IDs and titles to create one hash mapping ChEBI IDs
 # to experiment accessions and their titles..
 my $chebiId2expAcc2title = {};
 foreach my $chebiId ( keys %{ $chebiId2expAccs } ) {
-
-	foreach my $expAcc ( keys %{ $chebiId2expAccs->{ $chebiId } } ) {
+	
+    foreach my $expAcc ( keys %{ $chebiId2expAccs->{ $chebiId } } ) {
 
 		my $title = $expAcc2title->{ $expAcc };
 
 		# If we didn't get a title for this experiment, warn and skip.
 		unless( $title ) {
-			$logger->warn( "Did not find title for $expAcc in Atlas database." );
+			$logger->warn( "Did not find title for $expAcc in Atlas Web API." );
 			next;
 		}
 
@@ -167,7 +173,7 @@ sub get_chebi_experiment_accessions {
 # Query the Atlas database and get the titles for all the experiments we found
 # containing ChEBI IDs.
 # Return a hash mapping experiment accession to experiment title.
-sub get_experiment_titles_from_db {
+sub get_experiment_titles_from_webapi {
 
 	my ( $chebiId2expAccs ) = @_;
 
@@ -185,16 +191,47 @@ sub get_experiment_titles_from_db {
     # Experiment accessions are the keys of the new hash.
     my @expAccessions = keys %{ $expAccessions };
 
-	# Create Atlas database connection.
-	my $atlasDB = connect_pg_atlas;
 
     # Get the titles for the experiment accessions.
-    my $expAcc2title = $atlasDB->fetch_experiment_titles_from_atlasdb( \@expAccessions, $logger );
+    my $expAcc2title = fetch_experiment_titles_from_webpapi( \@expAccessions, $logger );
 
-    # Disconnect from Atlas DB.
-    $atlasDB->get_dbh->disconnect;
 
 	return $expAcc2title;
+}
+
+## fetch json formatted result for experiments and its titles from WebAPI.
+sub fetch_experiment_titles_from_webpapi {
+
+    my ( $accessions, $logger ) = @_;
+
+    my $url = "https://wwwdev.ebi.ac.uk/gxa/json/experiments";
+
+    my $json_hash;
+    my $expTitle;
+
+    # Empty hash for the results.
+    my $expAcc2title = {};
+
+   foreach my $expAcc  ( @{ $accessions } ) {
+        my $abs_url = join("/",$url,$expAcc);
+        my $ua = LWP::UserAgent->new;
+        my $response;
+        $response =  $ua->get($abs_url);
+        $logger->info( "Querying for experiment titles for $expAcc" );
+
+        if ($response->is_success) {
+            $json_hash = parse_json(decode ('UTF-8', $response->content));
+        }
+        else {
+         die $response->status_line;
+        }
+
+        $expTitle = $json_hash->{'experiment'}->{'description'};
+
+        $expAcc2title->{ $expAcc } = $expTitle;
+    }
+
+   return $expAcc2title;
 }
 
 
