@@ -4,13 +4,13 @@
 
  ## parse study_list as `echo -e "E-MTAB-5214"'\t'"E-MTAB-513"'\t'"E-MTAB-2836"`
 
-suppressMessages( library( ExpressionAtlas) )
 suppressMessages( library( funr) )
 
 script_path<-funr::get_script_path()
 
 ## loading generic functions 
 source(paste(script_path,"generic_functions.R",sep="/"))
+source(paste(script_path,"get_data_from_staging.R",sep="/"))
 
 # Get commandline arguments.
 args <- commandArgs( TRUE )
@@ -43,7 +43,7 @@ for (i in names(t)) {
 }
 
 ## sanity check 
-head(all)
+colnames(all)
 dim(all)
 
 x<-sapply(strsplit(colnames(all),split="_"),"[",3)
