@@ -288,6 +288,34 @@ sub fetch_degenes_experiments_contrasts_from_solrdb {
   return $geneIDs2expAccs2contrastIDs;
 }
 
+## fetch json formatted result for experiments and its titles from WebAPI.
+sub fetch_experiment_title_from_webpapi {
+
+    my ( $expAcc, $logger ) = @_;
+
+    my $url = "https://wwwdev.ebi.ac.uk/gxa/json/experiments";
+
+    my $json_hash;
+    my $expTitle;
+
+        my $abs_url = join("/",$url,$expAcc);
+        my $ua = LWP::UserAgent->new;
+        my $response;
+        $response =  $ua->get($abs_url);
+        $logger->info( "Querying for experiment titles for $expAcc" );
+
+        if ($response->is_success) {
+            $json_hash = parse_json(decode ('UTF-8', $response->content));
+        }
+        else {
+         die $response->status_line;
+        }
+
+        $expTitle = $json_hash->{'experiment'}->{'description'};
+
+   return $expTitle;
+}
+
 # get_and_write_expression_data_xml
 # 	- Get baseline and differential expression data from Atlas database and TSV
 # 	files, and write XML dump files.
@@ -704,6 +732,18 @@ sub get_and_write_experiments_info {
 	# experiments and one with info for differential experiments.
     my $H_differentialExperimentsInfo = $atlasDB->fetch_differential_experiment_info_from_atlasdb( $logger );
 	my $H_baselineExperimentsInfo = $atlasDB->fetch_baseline_experiment_info_from_atlasdb( $logger );
+
+	# populate $H_differentialExperimentsInfo with experiment titls for each differential study
+	foreach my $expAcc ( keys %{ $H_differentialExperimentsInfo } ) {
+		my $title = fetch_experiment_title_from_webpapi( $expAcc, $logger );
+        $H_differentialExperimentsInfo->{ $expAcc }->{ "title" } = $title;
+	} 
+
+	# populate $H_differentialExperimentsInfo with experiment title for each baseline study
+	foreach my $expAcc ( keys %{ $H_baselineExperimentsInfo } ) {
+		my $title = fetch_experiment_title_from_webpapi( $expAcc, $logger );
+        $H_baselineExperimentsInfo->{ $expAcc }->{ "title" } = $title;
+	} 
 
     # Disconnect from Atlas DB.
     $atlasDB->get_dbh->disconnect;
