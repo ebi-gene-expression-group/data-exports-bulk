@@ -731,15 +731,15 @@ sub get_and_write_experiments_info {
 	# Run the queries to create two hashes, one with info for baseline
 	# experiments and one with info for differential experiments.
     my $H_differentialExperimentsInfo = $atlasDB->fetch_differential_experiment_info_from_atlasdb( $logger );
-	my $H_baselineExperimentsInfo = $atlasDB->fetch_baseline_experiment_info_from_atlasdb( $logger );
+    my $H_baselineExperimentsInfo = $atlasDB->fetch_baseline_experiment_info_from_atlasdb( $logger );
 
-	# populate $H_differentialExperimentsInfo with experiment titls for each differential study
+	# populate $H_differentialExperimentsInfo with experiment titles for each differential study
 	foreach my $expAcc ( keys %{ $H_differentialExperimentsInfo } ) {
 		my $title = fetch_experiment_title_from_webpapi( $expAcc, $logger );
         $H_differentialExperimentsInfo->{ $expAcc }->{ "title" } = $title;
 	} 
 
-	# populate $H_differentialExperimentsInfo with experiment title for each baseline study
+	# populate $H_differentialExperimentsInfo with experiment titles for each baseline study
 	foreach my $expAcc ( keys %{ $H_baselineExperimentsInfo } ) {
 		my $title = fetch_experiment_title_from_webpapi( $expAcc, $logger );
         $H_baselineExperimentsInfo->{ $expAcc }->{ "title" } = $title;
