@@ -289,7 +289,7 @@ sub fetch_degenes_experiments_contrasts_from_solrdb {
 }
 
 ## fetch json formatted result for experiments and its titles from WebAPI.
-sub fetch_experiment_title_from_webpapi {
+sub fetch_experiment_title_from_webapi {
 
     my ( $expAcc, $logger ) = @_;
 
@@ -735,13 +735,13 @@ sub get_and_write_experiments_info {
 
 	# populate $H_differentialExperimentsInfo with experiment titles for each differential study
 	foreach my $expAcc ( keys %{ $H_differentialExperimentsInfo } ) {
-		my $title = fetch_experiment_title_from_webpapi( $expAcc, $logger );
+		my $title = fetch_experiment_title_from_webapi( $expAcc, $logger );
         $H_differentialExperimentsInfo->{ $expAcc }->{ "title" } = $title;
 	} 
 
 	# populate $H_differentialExperimentsInfo with experiment titles for each baseline study
 	foreach my $expAcc ( keys %{ $H_baselineExperimentsInfo } ) {
-		my $title = fetch_experiment_title_from_webpapi( $expAcc, $logger );
+		my $title = fetch_experiment_title_from_webapi( $expAcc, $logger );
         $H_baselineExperimentsInfo->{ $expAcc }->{ "title" } = $title;
 	} 
 
