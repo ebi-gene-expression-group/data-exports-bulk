@@ -73,7 +73,7 @@ check_env_var('ATLAS_PROD');
 check_env_var('BIOENTITY_PROPERTIES_ENSEMBL',"\$ATLAS_PROD/bioentity_properties/annotations/ensembl");
 check_env_var('BIOENTITY_PROPERTIES_WBPS',"\$ATLAS_PROD/bioentity_properties/annotations/wbps");
 check_env_var('SOLR_HOST',"should include both host and port if needed.");
-
+check_env_var('WEB_API_URL',"should include api url.");
 
 my $atlasProdDir = $ENV{ "ATLAS_PROD" };
 my $bioentity_properties_annotations_ensembl=$ENV{'BIOENTITY_PROPERTIES_ENSEMBL'};
@@ -100,7 +100,7 @@ my $configHash = {
 	bioentityPropertiesEnsemblDir => $bioentity_properties_annotations_ensembl,
 
     # Directory where <species>.wbpsgene.tsv files are.
-  bioentityPropertiesWBPSDir => $bioentity_properties_annotations_wbps,
+  	bioentityPropertiesWBPSDir => $bioentity_properties_annotations_wbps,
 
 	# Filename for differential Atlas data.
 	differentialDataFilename => "ebeye_differential_genes_export.xml",
@@ -293,27 +293,27 @@ sub fetch_experiment_title_from_webapi {
 
     my ( $expAcc, $logger ) = @_;
 
-    my $url = "https://wwwdev.ebi.ac.uk/gxa/json/experiments";
+    my $url = $ENV{'WEB_API_URL'};
 
     my $json_hash;
     my $expTitle;
 
-        my $abs_url = join("/",$url,$expAcc);
-        my $ua = LWP::UserAgent->new;
-        my $response;
-        $response =  $ua->get($abs_url);
-        $logger->info( "Querying for experiment titles for $expAcc" );
+    my $abs_url = join("/",$url,$expAcc);
+    my $ua = LWP::UserAgent->new;
+    my $response;
+    $response =  $ua->get($abs_url);
+    $logger->info( "Querying for experiment titles for $expAcc" );
 
-        if ($response->is_success) {
-            $json_hash = parse_json(decode ('UTF-8', $response->content));
-        }
-        else {
-         die $response->status_line;
-        }
+    if ($response->is_success) {
+    	$json_hash = parse_json(decode ('UTF-8', $response->content));
+    }
+    else {
+    	die $response->status_line;
+    }
 
-        $expTitle = $json_hash->{'experiment'}->{'description'};
+    $expTitle = $json_hash->{'experiment'}->{'description'};
 
-   return $expTitle;
+    return $expTitle;
 }
 
 # get_and_write_expression_data_xml
@@ -736,13 +736,13 @@ sub get_and_write_experiments_info {
 	# populate $H_differentialExperimentsInfo with experiment titles for each differential study
 	foreach my $expAcc ( keys %{ $H_differentialExperimentsInfo } ) {
 		my $title = fetch_experiment_title_from_webapi( $expAcc, $logger );
-        $H_differentialExperimentsInfo->{ $expAcc }->{ "title" } = $title;
+		$H_differentialExperimentsInfo->{ $expAcc }->{ "title" } = $title;
 	} 
 
 	# populate $H_differentialExperimentsInfo with experiment titles for each baseline study
 	foreach my $expAcc ( keys %{ $H_baselineExperimentsInfo } ) {
 		my $title = fetch_experiment_title_from_webapi( $expAcc, $logger );
-        $H_baselineExperimentsInfo->{ $expAcc }->{ "title" } = $title;
+		$H_baselineExperimentsInfo->{ $expAcc }->{ "title" } = $title;
 	} 
 
     # Disconnect from Atlas DB.
