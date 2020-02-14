@@ -19,5 +19,5 @@ if [ $? -ne 0 ]; then
     echo "ERROR: Failed to generate EB-eye dump"
     exit 1
 fi
-cp ebeye*.xml $ATLAS_EXPS
+cp ebeye*.xml $ATLAS_PROD/EBEYE_dumps
 popd
