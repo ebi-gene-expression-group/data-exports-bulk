@@ -37,7 +37,7 @@ listExperimentsToRetrieve(){
     IFS='; ' read -r -a exclude_exp <<< "$EXPERIMENTS_TO_EXCLUDE"
     printf "%s\n" "${exclude_exp[@]}" > experiments-exclude.tmp
     comm -23 \
-      <( curl -s $atlasUrl/json/experiments | jq -c -r '.aaData | map(select(.species=="Homo sapiens")) | map(select(.experimentType | test("(MICROARRAY)|(DIFFERENTIAL)"; "i")) |.experimentAccession) | @csv' | tr -s ',' '\n' | sed 's/"//g' \
+      <( curl -s $atlasUrl/json/experiments | jq -c -r '.experiments | map(select(.species=="Homo sapiens")) | map(select(.experimentType | test("(MICROARRAY)|(DIFFERENTIAL)"; "i")) |.experimentAccession) | @csv' | tr -s ',' '\n' | sed 's/"//g' \
         | sort -u ) \
       <( cut -f1 -d ' ' "experiments-exclude.tmp" | sort)
 }
