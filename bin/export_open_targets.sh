@@ -9,6 +9,10 @@ destination=${destination:-"$ATLAS_FTP/experiments/cttv010-$(date "+%Y-%m-%d").j
 usageMessage="Usage: (-a $atlasUrl) (-p urlParams:$urlParams) (-d destination:$destination) (-o outputPath:outputPath)"
 venvPath=${venvPath:-"$ATLAS_PROD/venvs"}
 
+[ ! -z ${opentargetsValidator+x} ] || ( echo "Env var opentargetsValidator version needs to be defined." && exit 1 )
+[ ! -z ${jsonSchemaVersion+x} ] || ( echo "Env var jsonSchemaVersion needs to be defined." && exit 1 )
+
+
 echo "To exclude experiments for open-targets, export env var EXPERIMENTS_TO_EXCLUDE=ACC1;...;ACCi;..ACCn"
 
 while getopts ":a:p:d:o:" opt; do
@@ -50,8 +54,8 @@ installValidator(){
   source $venvPath/ot-validator/bin/activate
   pip install --upgrade pip==18.1
   pip install --upgrade setuptools==40.6.2
-  pip install opentargets-validator==0.4.0
-  deactivate
+  pip install opentargets-validator=="$opentargetsValidator"
+    deactivate
 }
 
 installValidator
@@ -67,7 +71,7 @@ trap 'mv -fv ${destination}.tmp ${destination}.failed; exit 1' INT TERM EXIT
 listExperimentsToRetrieve | while read -r experimentAccession ; do
   echo "Retrieving experiment $experimentAccession ... "
   curl -s -w "\n" "$atlasUrl/json/experiments/$experimentAccession/evidence?$urlParams" | grep -v -e '^[[:space:]]*$' > $experimentAccession.tmp.json
-  opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/1.5.0/opentargets.json $experimentAccession.tmp.json 2>$experimentAccession.err
+  opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/${jsonSchemaVersion}/opentargets.json $experimentAccession.tmp.json 2>$experimentAccession.err
   if [ $(wc -l < $experimentAccession.err) -eq 0 ]; then
     cat $experimentAccession.tmp.json >> ${destination}.tmp
     rm $experimentAccession.tmp.json
