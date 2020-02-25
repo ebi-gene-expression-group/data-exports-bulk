@@ -71,16 +71,20 @@ trap 'mv -fv ${destination}.tmp ${destination}.failed; exit 1' INT TERM EXIT
 listExperimentsToRetrieve | while read -r experimentAccession ; do
   echo "Retrieving experiment $experimentAccession ... "
   curl -s -w "\n" "$atlasUrl/json/experiments/$experimentAccession/evidence?$urlParams" | grep -v -e '^[[:space:]]*$' > $experimentAccession.tmp.json
-  opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/${jsonSchemaVersion}/opentargets.json $experimentAccession.tmp.json 2>$experimentAccession.err
-  if [ $(wc -l < $experimentAccession.err) -eq 0 ]; then
-    cat $experimentAccession.tmp.json >> ${destination}.tmp
-    rm $experimentAccession.tmp.json
-    rm $experimentAccession.err
-  else
-    echo "$experimentAccession failed validation."
-    cat $experimentAccession.err
-    exit 1
-  fi
+    if [ -s "$experimentAccession.tmp.json" ]; then
+        opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/${jsonSchemaVersion}/opentargets.json $experimentAccession.tmp.json 2>$experimentAccession.err
+        if [ $(wc -l < $experimentAccession.err) -eq 0 ]; then
+          cat $experimentAccession.tmp.json >> ${destination}.tmp
+          rm $experimentAccession.tmp.json
+          rm $experimentAccession.err
+        else
+          echo "$experimentAccession failed validation."
+          cat $experimentAccession.err
+          exit 1
+        fi
+    else
+      echo "WARN: $experimentAccession.tmp.json empty response"     
+    fi    
 done
 rm -rf experiments-exclude.tmp
 
