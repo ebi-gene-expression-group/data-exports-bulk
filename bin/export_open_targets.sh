@@ -9,7 +9,7 @@ destination=${destination:-"$ATLAS_FTP/experiments/cttv010-$(date "+%Y-%m-%d").j
 usageMessage="Usage: (-a $atlasUrl) (-p urlParams:$urlParams) (-d destination:$destination) (-o outputPath:outputPath)"
 venvPath=${venvPath:-"$ATLAS_PROD/venvs"}
 
-[ ! -z ${opentargetsValidator+x} ] || ( echo "Env var opentargetsValidator version needs to be defined." && exit 1 )
+[ ! -z ${opentargetsValidatorVersion+x} ] || ( echo "Env var opentargetsValidatorVersion version needs to be defined." && exit 1 )
 [ ! -z ${jsonSchemaVersion+x} ] || ( echo "Env var jsonSchemaVersion needs to be defined." && exit 1 )
 
 
@@ -54,8 +54,8 @@ installValidator(){
   source $venvPath/ot-validator/bin/activate
   pip install --upgrade pip==18.1
   pip install --upgrade setuptools==40.6.2
-  pip install opentargets-validator=="$opentargetsValidator"
-    deactivate
+  pip install opentargets-validator=="$opentargetsValidatorVersion"
+  deactivate
 }
 
 installValidator
@@ -71,20 +71,20 @@ trap 'mv -fv ${destination}.tmp ${destination}.failed; exit 1' INT TERM EXIT
 listExperimentsToRetrieve | while read -r experimentAccession ; do
   echo "Retrieving experiment $experimentAccession ... "
   curl -s -w "\n" "$atlasUrl/json/experiments/$experimentAccession/evidence?$urlParams" | grep -v -e '^[[:space:]]*$' > $experimentAccession.tmp.json
-    if [ -s "$experimentAccession.tmp.json" ]; then
-        opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/${jsonSchemaVersion}/opentargets.json $experimentAccession.tmp.json 2>$experimentAccession.err
-        if [ $(wc -l < $experimentAccession.err) -eq 0 ]; then
-          cat $experimentAccession.tmp.json >> ${destination}.tmp
-          rm $experimentAccession.tmp.json
-          rm $experimentAccession.err
-        else
-          echo "$experimentAccession failed validation."
-          cat $experimentAccession.err
-          exit 1
-        fi
+  if [ -s "$experimentAccession.tmp.json" ]; then
+    opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/${jsonSchemaVersion}/opentargets.json $experimentAccession.tmp.json 2>$experimentAccession.err
+    if [ $(wc -l < $experimentAccession.err) -eq 0 ]; then
+      cat $experimentAccession.tmp.json >> ${destination}.tmp
+      rm $experimentAccession.tmp.json
+      rm $experimentAccession.err
     else
-      echo "WARN: $experimentAccession.tmp.json empty response"     
-    fi    
+      echo "$experimentAccession failed validation."
+      cat $experimentAccession.err
+      exit 1
+    fi
+  else
+    echo "WARN: $experimentAccession.tmp.json empty response"
+  fi 
 done
 rm -rf experiments-exclude.tmp
 
