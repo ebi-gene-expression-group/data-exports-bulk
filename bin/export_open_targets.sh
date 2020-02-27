@@ -9,6 +9,10 @@ destination=${destination:-"$ATLAS_FTP/experiments/cttv010-$(date "+%Y-%m-%d").j
 usageMessage="Usage: (-a $atlasUrl) (-p urlParams:$urlParams) (-d destination:$destination) (-o outputPath:outputPath)"
 venvPath=${venvPath:-"$ATLAS_PROD/venvs"}
 
+[ ! -z ${opentargetsValidatorVersion+x} ] || ( echo "Env var opentargetsValidatorVersion version needs to be defined." && exit 1 )
+[ ! -z ${jsonSchemaVersion+x} ] || ( echo "Env var jsonSchemaVersion needs to be defined." && exit 1 )
+
+
 echo "To exclude experiments for open-targets, export env var EXPERIMENTS_TO_EXCLUDE=ACC1;...;ACCi;..ACCn"
 
 while getopts ":a:p:d:o:" opt; do
@@ -37,7 +41,7 @@ listExperimentsToRetrieve(){
     IFS='; ' read -r -a exclude_exp <<< "$EXPERIMENTS_TO_EXCLUDE"
     printf "%s\n" "${exclude_exp[@]}" > experiments-exclude.tmp
     comm -23 \
-      <( curl -s $atlasUrl/json/experiments | jq -c -r '.aaData | map(select(.species=="Homo sapiens")) | map(select(.experimentType | test("(MICROARRAY)|(DIFFERENTIAL)"; "i")) |.experimentAccession) | @csv' | tr -s ',' '\n' | sed 's/"//g' \
+      <( curl -s $atlasUrl/json/experiments | jq -c -r '.experiments | map(select(.species=="Homo sapiens")) | map(select(.experimentType | test("(MICROARRAY)|(DIFFERENTIAL)"; "i")) |.experimentAccession) | @csv' | tr -s ',' '\n' | sed 's/"//g' \
         | sort -u ) \
       <( cut -f1 -d ' ' "experiments-exclude.tmp" | sort)
 }
@@ -50,7 +54,7 @@ installValidator(){
   source $venvPath/ot-validator/bin/activate
   pip install --upgrade pip==18.1
   pip install --upgrade setuptools==40.6.2
-  pip install opentargets-validator==0.4.0
+  pip install opentargets-validator=="$opentargetsValidatorVersion"
   deactivate
 }
 
@@ -67,16 +71,20 @@ trap 'mv -fv ${destination}.tmp ${destination}.failed; exit 1' INT TERM EXIT
 listExperimentsToRetrieve | while read -r experimentAccession ; do
   echo "Retrieving experiment $experimentAccession ... "
   curl -s -w "\n" "$atlasUrl/json/experiments/$experimentAccession/evidence?$urlParams" | grep -v -e '^[[:space:]]*$' > $experimentAccession.tmp.json
-  opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/1.5.0/opentargets.json $experimentAccession.tmp.json 2>$experimentAccession.err
-  if [ $(wc -l < $experimentAccession.err) -eq 0 ]; then
-    cat $experimentAccession.tmp.json >> ${destination}.tmp
-    rm $experimentAccession.tmp.json
-    rm $experimentAccession.err
+  if [ -s "$experimentAccession.tmp.json" ]; then
+    opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/${jsonSchemaVersion}/opentargets.json $experimentAccession.tmp.json 2>$experimentAccession.err
+    if [ $(wc -l < $experimentAccession.err) -eq 0 ]; then
+      cat $experimentAccession.tmp.json >> ${destination}.tmp
+      rm $experimentAccession.tmp.json
+      rm $experimentAccession.err
+    else
+      echo "$experimentAccession failed validation."
+      cat $experimentAccession.err
+      exit 1
+    fi
   else
-    echo "$experimentAccession failed validation."
-    cat $experimentAccession.err
-    exit 1
-  fi
+    echo "WARN: $experimentAccession.tmp.json empty response"
+  fi 
 done
 rm -rf experiments-exclude.tmp
 

@@ -13,7 +13,7 @@ get_experiments_loaded_since_date() {
 
     # dates from REST API come formatted as dd-mm-yyyy so we need to transform them
     curl -s $atlasUrl/json/experiments \
-      | jq -r --arg sinceDate "$sinceDateSecondsEpoch" '.aaData | map( .lastUpdate |= (strptime("%d-%m-%Y") | mktime) | select( .lastUpdate > ($sinceDate | tonumber) ) | .experimentAccession) | @csv' \
+      | jq -r --arg sinceDate "$sinceDateSecondsEpoch" '.experiments | map( .lastUpdate |= (strptime("%d-%m-%Y") | mktime) | select( .lastUpdate > ($sinceDate | tonumber) ) | .experimentAccession) | @csv' \
       | tr -s ',' '\n' | sed 's/"//g' | sort -u
 }
 
