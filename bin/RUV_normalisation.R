@@ -2,8 +2,8 @@
 
 # Author: Suhaib Mohammed
 
- ## parse study_list as `echo -e "E-MTAB-5214"'\t'"E-MTAB-513"'\t'"E-MTAB-2836"`
- ## study_type - tissues or cell_types
+## parse study_list as `echo -e "E-MTAB-5214"'\t'"E-MTAB-513"'\t'"E-MTAB-2836"`
+## study_type - tissues or cell_types
 
 suppressMessages( library(funr) )
 suppressMessages( library(EDASeq) )

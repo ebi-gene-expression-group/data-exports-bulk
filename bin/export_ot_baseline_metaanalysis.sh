@@ -18,21 +18,21 @@ for mod in data-exports-bulk/bin; do
 done
 
 ## Run the normalisation and batch correction of gtex and associated studies
-./RUV_normalisation.R "$TISSUE_STUDIES" "tissues" "$outpath_path"
+RUV_normalisation.R "$TISSUE_STUDIES" "tissues" "$outpath_path"
 if [ $? -ne 0 ]; then
     echo "ERROR: Failed to normalise Gtex associated studies"
     exit 1
 fi
 
 ## Run the normalisation and batch correction of blueprint studies
-./RUV_normalisation.R "$CELLTYPE_STUDIES" "cell_types" "$outpath_path"
+RUV_normalisation.R "$CELLTYPE_STUDIES" "cell_types" "$outpath_path"
 if [ $? -ne 0 ]; then
     echo "ERROR: Failed to normlalise blueprint associated studies"
     exit 1
 fi
 
 ## combine corrected gtex and blueorint
-./RUV_combine.R "tissues" "cell_types" "$outpath_path"
+RUV_combine.R "tissues" "cell_types" "$outpath_path"
 if [ $? -ne 0 ]; then
     echo "ERROR: Failed to combine studies"
     exit 1
