@@ -4,8 +4,8 @@ scriptDir=$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 [ ! -z ${ATLASPROD_PATH+x} ] || ( echo "Env var ATLASPROD_PATH path to the directory needs to be defined." && exit 1 )
 [ ! -z ${BASELINE_META_DESTINATION+x} ] || ( echo "Env var BASELINE_META_DESTINATION path to the baseline baseline meta analysis directory needs to be defined." && exit 1 )
-[ ! -z ${CELLTYPE_STUDIES+x} ] || ( echo "Env var CELLTYPE_STUDIES comma separated blueprint baseline studies needs to be defined." && exit 1 )
-[ ! -z ${TISSUE_STUDIES+x} ] || ( echo "Env var TISSUE_STUDIES comma separated gtex baseline studies needs to be defined." && exit 1 )
+[ ! -z ${CELLTYPE_STUDIES+x} ] || ( echo "Env var CELLTYPE_STUDIES comma separated cell types baseline studies needs to be defined." && exit 1 )
+[ ! -z ${TISSUE_STUDIES+x} ] || ( echo "Env var TISSUE_STUDIES comma separated tissue baseline studies needs to be defined." && exit 1 )
 [ ! -z ${ATLAS_EXPS+x} ] || ( echo "Env var ATLAS_EXPS path to the staging directory needs to be defined." && exit 1 )
 
 
