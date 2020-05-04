@@ -48,9 +48,9 @@ for (i in names(t)) {
   eCounts <- assays(exp)$counts
   samples<-colnames(eCounts)
   if ( study_type == "tissues" ){
-    average.counts<-technical_replicate_average_gtex(exp,expAcc)
+    average.counts<-technical_replicate_average_tissues(exp,expAcc)
   } else if ( study_type == "cell_types" ){
-    average.counts<-technical_replicate_average_bp(exp,expAcc,eCounts)
+    average.counts<-technical_replicate_average_cell_types(exp,expAcc,eCounts)
   }
     all <- as.matrix(mergeX(all,average.counts))
 }

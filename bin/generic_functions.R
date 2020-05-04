@@ -5,7 +5,7 @@
 ## all generic functions used for meta-analysis of gene expression
 
 ### average technical replicates blue prints
-technical_replicate_average_bp<-function(exp,expAcc,eCounts) {
+technical_replicate_average_cell_types<-function(exp,expAcc,eCounts) {
   
   cat("\n======================")
   cat ("\nProcessing",expAcc,"\n") 
@@ -80,7 +80,7 @@ technical_replicate_average_bp<-function(exp,expAcc,eCounts) {
 #################################################
 
 ### average technical replicates
-technical_replicate_average_gtex<-function(exp,expAcc) {
+technical_replicate_average_tissues<-function(exp,expAcc) {
   
   cat("\n======================")
   cat ("\nProcessing",expAcc,"\n") 
