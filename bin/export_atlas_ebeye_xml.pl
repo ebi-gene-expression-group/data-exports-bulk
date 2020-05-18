@@ -408,7 +408,7 @@ sub get_and_write_expression_data_xml {
 	foreach my $writer ($differentialWriter, $baselineWriter) {
 		$writer->xmlDecl("UTF-8");
 		$writer->startTag("database");
-		$writer->dataElement("name" => "Expression Atlas");
+		$writer->dataElement("name" => "ExpressionAtlas");
 		$writer->dataElement("description" => $atlasDescription);
 		$writer->emptyTag("release");
 		$writer->dataElement("release_date" => $date_string);
@@ -967,9 +967,13 @@ sub add_experiments_info {
 
 		# Add the date as "creation" date, "last_modification" and publication" date.
 		$writer->startTag("dates");
-		$writer->emptyTag("date", "type" => "creation", "value" => $H_experimentsInfo->{ $exptAcc }->{ "date" });
-		$writer->emptyTag("date", "type" => "last_modification", "value" => $H_experimentsInfo->{ $exptAcc }->{ "date" });
-		$writer->emptyTag("date", "type" => "publication", "value" => $H_experimentsInfo->{ $exptAcc }->{ "date" });
+
+		# format datefield to exclude any time stamps and retain only date
+		my $dateformat=(split /\s+/, $H_experimentsInfo->{ $exptAcc }->{ "date" })[0];
+
+		$writer->emptyTag("date", "type" => "creation", "value" => $dateformat);
+		$writer->emptyTag("date", "type" => "last_modification", "value" => $dateformat);
+		$writer->emptyTag("date", "type" => "publication", "value" => $dateformat);
 		$writer->endTag("dates");
 
 		# Start the "cross_references" element and add the accession as
