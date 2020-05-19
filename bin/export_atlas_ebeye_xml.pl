@@ -772,7 +772,7 @@ sub get_and_write_experiments_info {
 	foreach my $writer ($differentialExperimentsWriter, $baselineExperimentsWriter) {
 		$writer->xmlDecl("UTF-8");
 		$writer->startTag("database");
-		$writer->dataElement("name" => "Expression Atlas");
+		$writer->dataElement("name" => "ExpressionAtlas");
 		$writer->dataElement("description" => $atlasDescription);
 		$writer->emptyTag("release");
 		$writer->dataElement("release_date" => $date_string);
