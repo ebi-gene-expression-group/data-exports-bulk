@@ -93,30 +93,14 @@ my $configHash = {
 my $H_baselineExperimentsInfo = fetch_experiments_info_from_webapi($logger);
 
 # Connect to SC Atlas database.
- my $atlasDB = connect_sc_pg_atlas;
+my $atlasDB = connect_sc_pg_atlas;
+
+# Fetch cell types from db
+my $H_baselineCellTypeInfo = $atlasDB->fetch_experiment_celltypes_from_sc_atlasdb( $logger );
+
+# Fetch collections from db
+my $H_baselineCollectionInfo = $atlasDB->fetch_experiments_collections_from_sc_atlasdb( $logger);
  
- my @array=('E-MTAB-7078','E-HCAD-9','E-MTAB-');
- my $accessions=\@array;
- #my $accessions='E-MTAB-7078';
- my $H_baselineCellTypeInfo = $atlasDB->fetch_experiment_celltypes_from_sc_atlasdb( $logger );
- my $H_baselineCollectionInfo = $atlasDB->fetch_experiments_collections_from_sc_atlasdb( $logger);
- 
- use Data::Dumper;
-   my $accessions4query = "'" . join( "', '", @{ $accessions } ) . "'";
-
-    my $query = "
-        SELECT distinct EXPERIMENT_ACCESSION, VALUE FROM SCXA_CELL_GROUP
-        WHERE EXPERIMENT_ACCESSION in ($accessions4query) and
-        VARIABLE like '%cell%' and VALUE !='Not available'";
-
- print Dumper "accessions - $accessions \n";
- print Dumper "accessions4query - $accessions4query \n"; 
- print Dumper $query."\n";
- print Dumper $H_baselineCellTypeInfo;
- print Dumper $H_baselineCollectionInfo; 
-
-#print Dumper $H_baselineExperimentsInfo;
-
 # Get info from webAPI and write XMLs for baseline experiment info.
 get_and_write_experiments_info($configHash, $H_baselineExperimentsInfo, $H_baselineCellTypeInfo, $H_baselineCollectionInfo);
 
