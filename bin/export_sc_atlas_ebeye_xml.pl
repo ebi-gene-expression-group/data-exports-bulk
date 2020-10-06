@@ -205,24 +205,28 @@ sub add_experiments_info {
 
   # Add the title as the "description".
   $writer->dataElement("description" => $hash_ref->{ "experimentDescription" });
+
+  $writer->startTag("additional_fields");
   
-  $writer->dataElement("species" => $hash_ref->{ "species" });
+  $writer->dataElement("field" => $hash_ref->{ "species" }, "name" => "species" );
 
-  $writer->dataElement("technology" => @{ $hash_ref->{ "technologyType" } });
-
+  $writer->dataElement("field" => @{$hash_ref->{ "technologyType"}}, "name" => "technology");
+  
   ## factors included in each experiment
     foreach my $factor (@{ $hash_ref->{ "experimentalFactors" } }){
-         $writer->dataElement("factors" => $factor);
+         $writer->dataElement("field" => $factor, "name" => "factors" );
     }
   ## cell types included in each experiment
     foreach my $celltype (@{ $H_baselineCellTypeInfo->{ $exptAcc } }){
-         $writer->dataElement("celltype" => $celltype);
+         $writer->dataElement("field" => $celltype, "name" => "celltype" );
     }
 
   ## collections included in each experiment
     foreach my $collection (@{ $H_baselineCollectionInfo->{ $exptAcc } }){
-         $writer->dataElement("collection" => $collection);
+         $writer->dataElement("field" => $collection, "name" => "collection" );
     }
+
+  $writer->endTag("additional_fields");
 
   # Add the date as "creation" date, "last_modification" and publication" date.
   $writer->startTag("dates");
