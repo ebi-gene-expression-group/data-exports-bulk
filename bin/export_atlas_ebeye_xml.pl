@@ -543,8 +543,6 @@ sub get_and_write_expression_data_xml {
 				}
 				# Join the factor and value strings with "; ".
 				my $joinedFactorsValues = join "; ", @factorValueStrings;
-				# Add this to the description.
-				$diffDesc .= $joinedFactorsValues;
 
 				# Add differential description element.
 				$differentialWriter->dataElement("description" => $diffDesc);
@@ -598,8 +596,6 @@ sub get_and_write_expression_data_xml {
 				}
 				# Join the factor and value strings with "; ".
 				my $joinedFactorsValues = join "; ", @factorValueStrings;
-				# Add this to the description.
-				$baselineDesc .= $joinedFactorsValues;
 
 				# Add baseline description element
 				$baselineWriter->dataElement("description" => $baselineDesc);
