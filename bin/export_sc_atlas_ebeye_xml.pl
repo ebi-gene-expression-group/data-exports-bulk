@@ -73,6 +73,8 @@ sub check_env_var {
 
 check_env_var('ATLAS_PROD');
 check_env_var('WEB_API_URL',"should include api url.");
+check_env_var('CPM_THRESHOLD',"should include CPM threshold.");
+check_env_var('TPM_THRESHOLD',"should include TPM threshold.");
 
 my $atlasProdDir = $ENV{ "ATLAS_PROD" };
 
