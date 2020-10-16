@@ -173,13 +173,32 @@ sub add_gene_info {
      
      $baselineWriter->startTag("entry", "id" => $geneID );
 
-      add_shared_cross_references( $baselineWriter, $geneID, $H_baselineExperimentGeneInfo);
+      # Add the species_name
+      add_species_name( $baselineWriter, $geneID, $H_baselineExperimentGeneInfo );
 
-      add_shared_additional_fields ($baselineWriter, $geneID,  $H_baselineExperimentGeneInfo);
+      add_shared_cross_references( $baselineWriter, $geneID, $H_baselineExperimentGeneInfo );
+
+      add_shared_additional_fields ( $baselineWriter, $geneID,  $H_baselineExperimentGeneInfo );
   
     $baselineWriter->endTag("entry");
 
   }
+
+}
+
+sub add_species_name {
+
+    my ( $writer, $geneID, $H_baselineExperimentGeneInfo ) = @_;
+
+    my $species_name;
+
+    foreach my $exptAcc ( keys %{ $H_baselineExperimentGeneInfo->{ $geneID } }){
+
+      $species_name =  $H_baselineExperimentGeneInfo->{ $geneID }->{ $exptAcc }->{ 'species' };
+      print $species_name . "\n";
+    }
+      # Add gene associated species name
+      $writer->dataElement("name" => $species_name);
 
 }
 
