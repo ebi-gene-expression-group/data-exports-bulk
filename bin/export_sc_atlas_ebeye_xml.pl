@@ -195,7 +195,7 @@ sub add_species_name {
     foreach my $exptAcc ( keys %{ $H_baselineExperimentGeneInfo->{ $geneID } }){
 
       $species_name =  $H_baselineExperimentGeneInfo->{ $geneID }->{ $exptAcc }->{ 'species' };
-      print $species_name . "\n";
+    
     }
       # Add gene associated species name
       $writer->dataElement("name" => $species_name);
