@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-## export WEB_API_URL="https://wwwdev.ebi.ac.uk/gxa/sc/json"
+## export WEB_API_URL="https://wwwdev.ebi.ac.uk/gxa/sc/json/experiments"
 
 use strict;
 use warnings;
@@ -21,7 +21,6 @@ use Encode qw(
 );
 
 use Atlas::Common qw(
- connect_pg_atlas
  connect_sc_pg_atlas
  create_atlas_site_config
  get_atlas_contrast_details
@@ -73,8 +72,7 @@ sub check_env_var {
 
 check_env_var('ATLAS_PROD');
 check_env_var('WEB_API_URL',"should include api url.");
-check_env_var('CPM_THRESHOLD',"should include CPM threshold.");
-check_env_var('TPM_THRESHOLD',"should include TPM threshold.");
+check_env_var('MARKER_GENE_PVAL',"should include pval threshold.");
 
 my $atlasProdDir = $ENV{ "ATLAS_PROD" };
 
@@ -113,13 +111,14 @@ get_and_write_experiments_info($configHash, $H_baselineExperimentsInfo, $H_basel
 
 my $H_baselineExperimentGeneInfo = $atlasDB->fetch_experiment_genes_from_sc_atlasdb( $logger );
 
-get_and_write_genes_info( $configHash, $H_baselineExperimentGeneInfo );
+get_and_write_genes_info( $configHash, $H_baselineExperimentGeneInfo, $H_baselineExperimentsInfo );
 
 add_entry_count ( $configHash );
 
+
 sub get_and_write_genes_info {
 
-    my ($configHash, $H_baselineExperimentGeneInfo) = @_;
+ my ($configHash, $H_baselineExperimentGeneInfo, $H_baselineExperimentsInfo ) = @_;
 
  # Files to write XML to Baseline gene data.
  my $baselineDataFilename = $configHash->{ "baselineDataFilename" };
@@ -141,13 +140,15 @@ sub get_and_write_genes_info {
   $writer->emptyTag("release");
   $writer->dataElement("release_date" => $date_string);
   $writer->dataElement("entry_count" => "ENTRY_COUNT_PLACEHOLDER");
+  $writer->startTag("entries");
  }
  
  ## write baseline gene info
- add_gene_info( $baselineWriter, $H_baselineExperimentGeneInfo);
+ add_gene_info( $baselineWriter, $H_baselineExperimentGeneInfo, $H_baselineExperimentsInfo);
  
  # Close entries and database elements for both writers.
  foreach my $writer ($baselineWriter) {
+  $writer->endTag("entries");
   $writer->endTag("database");
   $writer->end();
  }
@@ -160,80 +161,49 @@ sub get_and_write_genes_info {
 
 sub add_gene_info {
 
- my ($baselineWriter, $H_baselineExperimentGeneInfo) =  @_;
+ my ($baselineWriter, $H_baselineExperimentGeneInfo, $H_baselineExperimentsInfo) =  @_;
     
+ my $geneIDs2expAccs2species2pubmed_ids = {};
+ 
 ## iterate of baseline gene expressed
- foreach my $geneID ( @{$H_baselineExperimentGeneInfo} ){
-   
-  $baselineWriter->startTag("entry", "id" => $geneID );
+ foreach my $geneID  ( (keys %{ $H_baselineExperimentGeneInfo}) ) {
+     
+     ## TODO include when schema adapts    
+     my $url = "https://wwwdev.ebi.ac.uk/gxa/sc/search?ensgene=". $geneID ;
+     
+     $baselineWriter->startTag("entry", "id" => $geneID );
 
-  my $H_baselineGeneInfo = fetch_gene_info_from_webapi( $geneID, $logger);
-  my $baselineExptCount;
-  $baselineExptCount = (scalar @{ $H_baselineGeneInfo->{'results'} });
-  $baselineWriter->dataElement("studies_count" => $baselineExptCount);
+      add_shared_cross_references( $baselineWriter, $geneID, $H_baselineExperimentGeneInfo);
 
-  if( $baselineExptCount ) {
+      add_shared_additional_fields ($baselineWriter, $geneID,  $H_baselineExperimentGeneInfo);
+  
+    $baselineWriter->endTag("entry");
 
-    foreach my $hash_ref ( @{ $H_baselineGeneInfo->{'results'} } ) {
-       
-        my $exptAcc = $hash_ref->{'element'}->{'experimentAccession'};
-       # print $exptAcc."\n";
-       $baselineWriter->startTag("cross_references");
-
-       # Write accessions to XML.
-       $baselineWriter->emptyTag("ref", "dbname" => "sc atlas", "dbkey" => $exptAcc);
-
-       my $exp_url = $hash_ref->{'element'}->{'url'};
-
-       $baselineWriter->emptyTag("ref", "dbname" => "sc atlas", "url" => $exp_url);
-
-        # Close cross_references element.
-        $baselineWriter->endTag("cross_references");
-
-        # Fill in the additional_fields.
-        # Begin element.
-        $baselineWriter->startTag("additional_fields");
-
-        foreach my $factor_hash (@{ $hash_ref->{'element'}->{'factors'} }) {
-         # print $factor_hash."\n";
-          $baselineWriter->dataElement("field" => $factor_hash, "name" => "factors" );
-        }
-
-        my $exp_assays = $hash_ref->{'element'}->{'numberOfAssays'};
-        #print $exp_assays."\n";
-
-        $baselineWriter->dataElement("field" => $exp_assays, "name" => "numberOfAssays" );
-
-        my $markergenes_hash = @{ $hash_ref->{'element'}->{'markerGenes'} };
-            if ($markergenes_hash) {
-          #  print "MARKER - $markergenes_hash". "\n";
-            $baselineWriter->dataElement("field" => $markergenes_hash, "name" => "markerGenes" );
-        }
-
-        # Close the additional_fields element.
-        $baselineWriter->endTag("additional_fields");
-
-    }
-   }
-   $baselineWriter->endTag("entry");
   }
+
 }
 
 sub add_shared_cross_references {
-    my ( $writer, $H_baselineGeneInfo ) = @_;
+    my ( $writer, $geneID, $H_baselineExperimentGeneInfo ) = @_;
 
     $writer->startTag("cross_references");
 
-    foreach my $hash_ref ( @{ $H_baselineGeneInfo->{'results'} } ){
-       my $exptAcc = $hash_ref->{'element'}->{'experimentAccession'};
-       # print $exptAcc."\n";
+     foreach my $exptAcc ( keys %{ $H_baselineExperimentGeneInfo->{ $geneID } }){
 
        # Write accessions to XML.
        $writer->emptyTag("ref", "dbname" => "sc atlas", "dbkey" => $exptAcc);
-
-       my $exp_url = $hash_ref->{'element'}->{'url'};
        
-       $writer->emptyTag("ref", "dbname" => "sc atlas", "url" => $exp_url);
+       ## although we captuting url we are not including in dump as schema doesnt support
+       ## TODO include when schema adapts
+       my $exp_url = "http://wwwdev.ebi.ac.uk/gxa/sc/experiments/". $exptAcc . "?geneId=". $geneID;
+       
+       my $pubmed_id =  $H_baselineExperimentGeneInfo->{ $geneID }->{ $exptAcc }->{ 'pubmed_id' };
+
+        if ( $pubmed_id ) {
+
+             $writer->emptyTag("ref", "dbname" => "pmid", "dbkey" => $pubmed_id );
+        }
+
     }
    
      # Close cross_references element.
@@ -245,29 +215,33 @@ sub add_shared_cross_references {
 }
 
 sub add_shared_additional_fields {
-    my ( $writer, $H_baselineGeneInfo ) = @_;
 
-    foreach my $hash_ref ( @{ $H_baselineGeneInfo->{'results'} } ){
-   
-        foreach my $factor_hash (@{ $hash_ref->{'element'}->{'factors'} }){
-          print $factor_hash."\n";
-          $writer->dataElement("field" => $factor_hash, "name" => "factors" );
-        }   
+    my ( $writer, $geneID, $H_baselineExperimentGeneInfo ) = @_;
 
-        my $exp_assays = $hash_ref->{'element'}->{'numberOfAssays'};
-        print $exp_assays."\n";
+    ## gene associated experiment count
+    my $baselineExptCount = (keys %{ $H_baselineExperimentGeneInfo->{ $geneID } });
+    $writer->dataElement("field" => $baselineExptCount, "name" => "studies_count" );
 
-        $writer->dataElement("field" => $exp_assays, "name" => "numberOfAssays" );
+    foreach my $expAcc ( keys %{ $H_baselineExperimentGeneInfo->{ $geneID } }){
 
-        my $markergenes_hash = @{ $hash_ref->{'element'}->{'markerGenes'} };
-            if ($markergenes_hash) {
-                 print "MARKER - $markergenes_hash". "\n";
-            $writer->dataElement("field" => $markergenes_hash, "name" => "markerGenes" );
+       ## factor values
+        foreach my $hash_ref (@{ $H_baselineExperimentsInfo->{'experiments'} }){
+             if ( $hash_ref->{'experimentAccession'} eq "$expAcc" ){
+
+                ## factors included in each experiment
+                foreach my $factor (@{ $hash_ref->{ "experimentalFactors" } }){
+                $writer->dataElement("field" => $factor, "name" => "factors" );
+
+                }
+            }
+
         }
+
     }
 
  # Close the additional_fields element.
  $writer->endTag("additional_fields");
+
 }
 
 ## fetch json formatted result for experiments and its titles from WebAPI.
@@ -281,7 +255,6 @@ sub fetch_gene_info_from_webapi {
 
     $url = join("/",$url,"search?ensgene=");
     my $abs_url = $url . $gene_id . "&species=";
-    # print $abs_url;
     my $ua = LWP::UserAgent->new;
     my $response;
     $response =  $ua->get($abs_url);
@@ -323,11 +296,9 @@ sub fetch_experiments_info_from_webapi {
 }
 
 # get_and_write_experiments_info
-#  - Retrieve differential and baseline experiments information from Atlas
-#  database and write it to XML dump files (differential to one, baseline to
-#  another).
+# - Retrieve sc baseline experiments information from sc Atlas
+#  database and write it to XML dump files 
 sub get_and_write_experiments_info {
-
  my ($configHash, $H_baselineExperimentsInfo, $H_baselineCellTypeInfo, $H_baselineCollectionInfo) = @_;
 
  # Files to write XML to.
@@ -360,10 +331,10 @@ sub get_and_write_experiments_info {
  $baselineExperimentsWriter->dataElement("entry_count" => $baselineExperimentsCount);
 
  # Start the "entries" element.
- foreach my $writer ($baselineExperimentsWriter) {
-  $writer->startTag("entries");
- }
-
+  foreach my $writer ($baselineExperimentsWriter) {
+     $writer->startTag("entries");
+  }
+      
  # Write the baseline experiments info.
  add_experiments_info($baselineExperimentsWriter, $H_baselineExperimentsInfo, $H_baselineCellTypeInfo, $H_baselineCollectionInfo);
 
@@ -404,7 +375,11 @@ sub add_experiments_info {
   
   $writer->dataElement("field" => $hash_ref->{ "species" }, "name" => "species" );
 
-  $writer->dataElement("field" => @{$hash_ref->{ "technologyType"}}, "name" => "technology");
+  foreach my $technology (@{$hash_ref->{ "technologyType"}}){
+      if ($technology){
+        $writer->dataElement("field" => $technology, "name" => "technology");
+    }
+  }
   
   ## factors included in each experiment
     foreach my $factor (@{ $hash_ref->{ "experimentalFactors" } }){
@@ -462,4 +437,3 @@ sub add_entry_count {
   $logger->info( "Entry count added." );
  }
 }
-
