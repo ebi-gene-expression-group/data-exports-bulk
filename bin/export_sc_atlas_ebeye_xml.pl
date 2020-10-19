@@ -73,6 +73,7 @@ sub check_env_var {
 check_env_var('ATLAS_PROD');
 check_env_var('WEB_API_URL',"should include api url.");
 check_env_var('MARKER_GENE_PVAL',"should include pval threshold.");
+check_env_var('SOLR_HOST',"should include solr host.");
 
 my $atlasProdDir = $ENV{ "ATLAS_PROD" };
 
@@ -111,14 +112,18 @@ get_and_write_experiments_info($configHash, $H_baselineExperimentsInfo, $H_basel
 
 my $H_baselineExperimentGeneInfo = $atlasDB->fetch_experiment_genes_from_sc_atlasdb( $logger );
 
-get_and_write_genes_info( $configHash, $H_baselineExperimentGeneInfo, $H_baselineExperimentsInfo );
+my $baselineGeneNamesSolrURL = "http://".$ENV{'SOLR_HOST'}."/solr/bioentities/select?omitHeader=true&fq=property_name:symbol&q=*:*&fl=bioentity_identifier,property_value&rows=100000000";
+
+my $GeneNames_ref = parse_json_from_solr ( $baselineGeneNamesSolrURL, $logger ) ;
+
+get_and_write_genes_info( $configHash, $H_baselineExperimentGeneInfo, $H_baselineExperimentsInfo, $GeneNames_ref );
 
 add_entry_count ( $configHash );
 
 
 sub get_and_write_genes_info {
 
- my ($configHash, $H_baselineExperimentGeneInfo, $H_baselineExperimentsInfo ) = @_;
+ my ($configHash, $H_baselineExperimentGeneInfo, $H_baselineExperimentsInfo, $GeneNames_ref ) = @_;
 
  # Files to write XML to Baseline gene data.
  my $baselineDataFilename = $configHash->{ "baselineDataFilename" };
@@ -144,7 +149,7 @@ sub get_and_write_genes_info {
  }
  
  ## write baseline gene info
- add_gene_info( $baselineWriter, $H_baselineExperimentGeneInfo, $H_baselineExperimentsInfo);
+ add_gene_info( $baselineWriter, $H_baselineExperimentGeneInfo, $H_baselineExperimentsInfo, $GeneNames_ref);
  
  # Close entries and database elements for both writers.
  foreach my $writer ($baselineWriter) {
@@ -161,7 +166,7 @@ sub get_and_write_genes_info {
 
 sub add_gene_info {
 
- my ($baselineWriter, $H_baselineExperimentGeneInfo, $H_baselineExperimentsInfo) =  @_;
+ my ($baselineWriter, $H_baselineExperimentGeneInfo, $H_baselineExperimentsInfo, $GeneNames_ref) =  @_;
     
  my $geneIDs2expAccs2species2pubmed_ids = {};
  
@@ -173,8 +178,8 @@ sub add_gene_info {
      
      $baselineWriter->startTag("entry", "id" => $geneID );
 
-      # Add the species_name
-      add_species_name( $baselineWriter, $geneID, $H_baselineExperimentGeneInfo );
+     # Add the gene symbol as "name".
+      add_gene_name ( $baselineWriter, $geneID, $GeneNames_ref );
 
       add_shared_cross_references( $baselineWriter, $geneID, $H_baselineExperimentGeneInfo );
 
@@ -184,6 +189,22 @@ sub add_gene_info {
 
   }
 
+}
+
+sub add_gene_name {
+
+    my ( $writer, $geneID, $GeneNames_ref ) = @_;
+
+    foreach my $hash_ref ( @{ $GeneNames_ref } ){
+
+        if ( $hash_ref->{'bioentity_identifier'} eq "$geneID" ){
+          
+           my $gene_symbol = $hash_ref->{'property_value'};
+
+           #Add the accession as the "gene name".
+           $writer->dataElement("name" => $gene_symbol);
+        }
+     }
 }
 
 sub add_species_name {
@@ -198,7 +219,7 @@ sub add_species_name {
     
     }
       # Add gene associated species name
-      $writer->dataElement("name" => $species_name);
+    $writer->dataElement("field" => $species_name, "name" => "species" );
 
 }
 
@@ -240,6 +261,9 @@ sub add_shared_additional_fields {
     ## gene associated experiment count
     my $baselineExptCount = (keys %{ $H_baselineExperimentGeneInfo->{ $geneID } });
     $writer->dataElement("field" => $baselineExptCount, "name" => "studies_count" );
+
+    # Add the species_name
+    add_species_name( $baselineWriter, $geneID, $H_baselineExperimentGeneInfo );
 
     foreach my $expAcc ( keys %{ $H_baselineExperimentGeneInfo->{ $geneID } }){
 
