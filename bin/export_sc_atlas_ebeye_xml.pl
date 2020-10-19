@@ -121,6 +121,26 @@ get_and_write_genes_info( $configHash, $H_baselineExperimentGeneInfo, $H_baselin
 add_entry_count ( $configHash );
 
 
+## parse json formatted result for genes associated to experiments accessions and assay group ids.
+sub parse_json_from_solr {
+
+   my ( $url, $logger ) =  @_;
+   my $ua = LWP::UserAgent->new;
+
+   my $response;
+   $response =  $ua->request(GET "$url");
+
+    $logger->info( "response successful." );
+
+   my $json_hash = parse_json(decode ('UTF-8', $response->content));
+
+     $logger->info( "parsing json successful." );
+
+   my $array_ref = $json_hash->{'response'}->{'docs'};
+
+   return $array_ref;
+}
+
 sub get_and_write_genes_info {
 
  my ($configHash, $H_baselineExperimentGeneInfo, $H_baselineExperimentsInfo, $GeneNames_ref ) = @_;
@@ -198,7 +218,7 @@ sub add_gene_name {
     foreach my $hash_ref ( @{ $GeneNames_ref } ){
 
         if ( $hash_ref->{'bioentity_identifier'} eq "$geneID" ){
-          
+
            my $gene_symbol = $hash_ref->{'property_value'};
 
            #Add the accession as the "gene name".
@@ -263,7 +283,7 @@ sub add_shared_additional_fields {
     $writer->dataElement("field" => $baselineExptCount, "name" => "studies_count" );
 
     # Add the species_name
-    add_species_name( $baselineWriter, $geneID, $H_baselineExperimentGeneInfo );
+    add_species_name( $writer, $geneID, $H_baselineExperimentGeneInfo );
 
     foreach my $expAcc ( keys %{ $H_baselineExperimentGeneInfo->{ $geneID } }){
 
