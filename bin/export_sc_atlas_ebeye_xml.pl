@@ -74,6 +74,10 @@ check_env_var('ATLAS_PROD');
 check_env_var('WEB_API_URL',"should include api url.");
 check_env_var('MARKER_GENE_PVAL',"should include pval threshold.");
 check_env_var('SOLR_HOST',"should include solr host.");
+check_env_var('SC_PG_DSN',"should include pg database dsn.");
+check_env_var('SC_PG_USERNAME',"should include pg database username.");
+check_env_var('SC_PG_PASSWORD',"should include pg database password.");
+
 
 my $atlasProdDir = $ENV{ "ATLAS_PROD" };
 
