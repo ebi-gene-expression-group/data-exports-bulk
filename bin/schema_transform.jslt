@@ -1,0 +1,15 @@
+{
+    "datasourceId" : .sourceID,
+    "biosamplesFromSource" : replace(.disease.biosample.id, ".*/", ""), 
+    "confidence" : .evidence.confidence_level,
+    "contrast" : .evidence.comparison_name,
+    "datatypeId" : .type,
+    "diseaseFromSourceMappedId" : replace(.unique_association_fields.disease_id, ".*/", ""),
+    "literature" : [replace(.literature.references[0].lit_id, ".*/", "")], 
+    "log2FoldChangePercentileRank" : .evidence.log2_fold_change.percentile_rank,
+    "log2FoldChangeValue" : .evidence.log2_fold_change.value,
+    "resourceScore" : .evidence.resource_score.value,
+    "studyId" : replace(.unique_association_fields.study_id, ".*/", ""),
+    "studyOverview" : .evidence.experiment_overview,
+    "targetFromSourceId" : replace(.unique_association_fields.geneID, ".*/", "") 
+}
