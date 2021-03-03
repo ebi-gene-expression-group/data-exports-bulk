@@ -1,0 +1,78 @@
+{
+  "sourceID": "expression_atlas",
+  "type": "rna_expression",
+  "access_level": "public",
+  "unique_association_fields": {
+    "geneID": "http://identifiers.org/ensembl/ENSG00000140505",
+    "study_id": "http://identifiers.org/gxa.expt/E-GEOD-33294",
+    "comparison_name": "'liver tumor' vs 'adjacent non-tumor tissue'",
+    "disease_id": "http://www.ebi.ac.uk/efo/EFO_0000182"
+  },
+  "target": {
+    "id": "http://identifiers.org/ensembl/ENSG00000140505",
+    "target_type": "http://identifiers.org/cttv.target/transcript_evidence",
+    "activity": "http://identifiers.org/cttv.activity/decreased_transcript_level"
+  },
+  "disease": {
+    "id": "http://www.ebi.ac.uk/efo/EFO_0000182",
+    "biosample": {
+      "name": "liver",
+      "id": "http://purl.obolibrary.org/obo/UBERON_0002107"
+    }
+  },
+  "evidence": {
+    "is_associated": true,
+    "unique_experiment_reference": "STUDYID_E-GEOD-33294",
+    "urls": [
+      {
+        "nice_name": "ArrayExpress Experiment overview",
+        "url": "http://identifiers.org/arrayexpress/E-GEOD-33294"
+      },
+      {
+        "nice_name": "Gene expression in Expression Atlas",
+        "url": "http://www.ebi.ac.uk/gxa/experiments/E-GEOD-33294?geneQuery=ENSG00000140505"
+      },
+      {
+        "nice_name": "Baseline gene expression in Expression Atlas",
+        "url": "http://www.ebi.ac.uk/gxa/genes/ENSG00000140505"
+      }
+    ],
+    "evidence_codes": [
+      "http://purl.obolibrary.org/obo/ECO_0000295"
+    ],
+    "log2_fold_change": {
+      "value": -10.6,
+      "percentile_rank": 100
+    },
+    "test_sample": "tumor",
+    "reference_sample": "adjacent non-tumor tissue",
+    "date_asserted": "2019-05-14T15:33:21Z",
+    "experiment_overview": "Transcriptome sequencing of human hepatocellular carcinoma",
+    "comparison_name": "'liver tumor' vs 'adjacent non-tumor tissue'",
+    "organism_part": "http://purl.obolibrary.org/obo/UBERON_0002107",
+    "test_replicates_n": 3,
+    "reference_replicates_n": 3,
+    "confidence_level": "low",
+    "resource_score": {
+      "value": 4.3e-64,
+      "method": {
+        "description": "DESeq2 version: 1.10.1"
+      },
+      "type": "pvalue"
+    },
+    "provenance_type": {
+      "database": {
+        "version": "prod.30",
+        "id": "Expression_Atlas"
+      }
+    }
+  },
+  "literature": {
+    "references": [
+      {
+        "lit_id": "http://europepmc.org/abstract/MED/23766440"
+      }
+    ]
+  }
+}
+
