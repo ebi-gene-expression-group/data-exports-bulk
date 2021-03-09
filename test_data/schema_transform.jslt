@@ -1,9 +1,10 @@
-
-let lit_filt = [for ([replace(.literature.references[0].lit_id, ".*/", "")]) string(.) if (. != null)]
+let lit = [for (.literature.references) string(replace(.lit_id, ".*/", ""))]
+let lit_filt = [for ($lit) string(.) if (. != null)]
+let biosamples = [for ([replace(.disease.biosample.id, ".*/", "")]) string(.) if (. != null)]
 
 {
     "datasourceId" : .sourceID,
-    "biosamplesFromSource" : [replace(.disease.biosample.id, ".*/", "")], 
+    "biosamplesFromSource" : if (size($biosamples) >= 1) $biosamples, 
     "confidence" : .evidence.confidence_level,
     "contrast" : replace(.evidence.comparison_name, "u0027", "'"),
     "datatypeId" : .type,
