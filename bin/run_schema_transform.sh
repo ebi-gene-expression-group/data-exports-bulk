@@ -6,7 +6,7 @@
 
 touch /data/$PROCESSED_JSON
 
-while read line; do
+cat /data/$INPUT_JSON | while IFS="\t" read line; do
     echo $line > tmp.json
-    java -cp /app/run-jslt.jar com.schibsted.spt.data.jslt.cli.JSLT /data/$SCHEMA_TRANSFORM tmp.json >> /data/$PROCESSED_JSON
-done < /data/$INPUT_JSON
+    java -cp /app/run-jslt.jar com.schibsted.spt.data.jslt.cli.JSLT /data/$SCHEMA_TRANSFORM tmp.json | jq -c . >> /data/$PROCESSED_JSON
+done
