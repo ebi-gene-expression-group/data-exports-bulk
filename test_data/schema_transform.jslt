@@ -1,13 +1,16 @@
+
+let lit_filt = [for ([replace(.literature.references[0].lit_id, ".*/", "")]) string(.) if (. != null)]
+
 {
     "datasourceId" : .sourceID,
-    "biosamplesFromSource" : replace(.disease.biosample.id, ".*/", ""), 
+    "biosamplesFromSource" : [replace(.disease.biosample.id, ".*/", "")], 
     "confidence" : .evidence.confidence_level,
     "contrast" : replace(.evidence.comparison_name, "u0027", "'"),
     "datatypeId" : .type,
     "diseaseFromSourceMappedId" : replace(.unique_association_fields.disease_id, ".*/", ""),
-    "literature" : [replace(.literature.references[0].lit_id, ".*/", "")], 
     "log2FoldChangePercentileRank" : .evidence.log2_fold_change.percentile_rank,
     "log2FoldChangeValue" : .evidence.log2_fold_change.value,
+    "literature" : if (size($lit_filt) >= 1) $lit_filt,
     "resourceScore" : .evidence.resource_score.value,
     "studyId" : replace(.unique_association_fields.study_id, ".*/", ""),
     "studyOverview" : .evidence.experiment_overview,
