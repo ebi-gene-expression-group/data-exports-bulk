@@ -16,10 +16,11 @@ if [ $container == "docker" ]; then
                -e PROCESSED_JSON=$PROCESSED_JSON \
                $IMAGE_NAME /src/run_schema_transform.sh
 elif [ $container == "singularity" ]; then
-    singularity run -B $INPUT_JSON:/data/input.json \
+    singularity exec -B $INPUT_JSON:/data/input.json \
                -B $SCHEMA_TRANSFORM:/data/schema_transform.jslt \
                -B $OUTPUT_DIR:/data/outputs \
-               $IMAGE_NAME /src/run_schema_transform.sh
+               --env PROCESSED_JSON=$PROCESSED_JSON \
+               docker://$IMAGE_NAME /src/run_schema_transform.sh
 else
     echo "Variable 'container' must be set to 'docker' or 'singularity'" && exit 1
 fi
