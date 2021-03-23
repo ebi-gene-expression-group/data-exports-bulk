@@ -15,6 +15,7 @@ Our central Jenkins provision has execution jobs for all of these.
 Version 0.1.0 was used for the Nov 2018 release.
 
 ### Open Targets JSON schema transform
+
 `bin/schema_transform.jslt` file contains logic required to migrate JSON files across different schemas. To run transformation into the new Open Targets schema, use the [JSLT](https://github.com/schibsted/jslt) Java library. The simplest way is to run it via docker container: 
 
 ```
@@ -32,6 +33,5 @@ Optional variables:
 - `PROCESSED_JSON` - specify name of output processed json file
 - `OUTPUT_DIR` - specify absolute path to output directory
 - `IMAGE_NAME` - specify Docker image name to be used
-
 
 
