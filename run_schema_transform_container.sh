@@ -22,5 +22,5 @@ elif [ $container == "singularity" ]; then
                --env PROCESSED_JSON=$PROCESSED_JSON \
                docker://$IMAGE_NAME /src/run_schema_transform.sh
 else
-    echo "Variable 'container' must be set to 'docker' or 'singularity'" && exit 1
+    echo "Variable 'container' must be set to 'docker' or 'singularity', please provide one of them as first argument." && exit 1
 fi
