@@ -7,7 +7,7 @@ jobs:
     container:
       image: quay.io/ebigxa/json_schema_transform
     steps:
-    - run: run_tests.sh  
+      - run: run_tests.sh  
 
 
 
