@@ -6,6 +6,7 @@ jobs:
   run_test:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Fetch container
         run: |
           docker pull quay.io/ebigxa/json_schema_transform
