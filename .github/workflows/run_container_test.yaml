@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   run_test:
+    runs-on: ubuntu-latest
     container:
       image: quay.io/ebigxa/json_schema_transform
     steps:
