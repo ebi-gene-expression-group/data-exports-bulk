@@ -5,11 +5,13 @@ on: [push, pull_request]
 jobs:
   run_test:
     runs-on: ubuntu-latest
+    container:
+      image: quay.io/ebigxa/json_schema_transform
     steps:
       - uses: actions/checkout@v2
-      - name: Fetch container
+      - name: Add workspace to path
         run: |
-          docker pull quay.io/ebigxa/json_schema_transform
+          echo "${GITHUB_WORKSPACE}" >> $GITHUB_PATH
       - name: Run test script
         run: |
           run_tests.sh  
