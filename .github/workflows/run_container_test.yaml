@@ -1,0 +1,13 @@
+name: Test JSON schema transforation in container 
+
+on: [push, pull_request]
+
+jobs:
+  run_test:
+    container:
+      image: quay.io/ebigxa/json_schema_transform
+    steps:
+      run: run_tests.sh  
+
+
+

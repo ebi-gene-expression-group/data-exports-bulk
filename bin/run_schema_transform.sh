@@ -1,5 +1,5 @@
 #!/usr/bin/env bash 
-[! -d /data/outputs ] && mkdir /data/outputs
+[ ! -d /data/outputs ] && mkdir /data/outputs
 touch /data/outputs/$PROCESSED_JSON
 
 java -cp /app/run-jslt.jar com.schibsted.spt.data.jslt.cli.MultiLineJSLT \
