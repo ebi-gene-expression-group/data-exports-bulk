@@ -6,8 +6,9 @@ jobs:
   run_test:
     runs-on: ubuntu-latest
     steps:
-      - run: docker pull quay.io/ebigxa/json_schema_transform
-      - run: ./run_tests.sh  
-
-
-
+      - name: Fetch container
+        run: |
+          docker pull quay.io/ebigxa/json_schema_transform
+      - name: Run test script
+        run: |
+          run_tests.sh  
