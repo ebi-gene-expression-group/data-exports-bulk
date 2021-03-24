@@ -5,9 +5,8 @@ on: [push, pull_request]
 jobs:
   run_test:
     runs-on: ubuntu-latest
-    container:
-      image: quay.io/ebigxa/json_schema_transform
     steps:
+      - run: docker pull quay.io/ebigxa/json_schema_transform
       - run: ./run_tests.sh  
 
 
