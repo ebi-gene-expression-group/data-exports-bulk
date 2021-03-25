@@ -5,6 +5,9 @@ on: [push, pull_request]
 jobs:
   run_test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
     steps:
       - uses: actions/checkout@v2
       - name: Add workspace to path
@@ -20,6 +23,7 @@ jobs:
           activate-environment: test
           channels: bioconda
           environment-file: test_environment.yaml
+      
       - name: Activate environment 
         run: conda activate test
 
