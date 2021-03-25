@@ -20,6 +20,7 @@ jobs:
           activate-environment: test
           channels: bioconda
           environment-file: test_environment.yaml
+        run: conda list 
 
       - name: Run test script
         run: |
