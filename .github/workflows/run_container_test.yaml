@@ -12,7 +12,12 @@ jobs:
       - name: Add workspace to path
         run: |
           echo "${GITHUB_WORKSPACE}" >> $GITHUB_PATH
+
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: test
+          environment-file: test-environment.yml
+
       - name: Run test script
         run: |
           run_tests.sh  
-
