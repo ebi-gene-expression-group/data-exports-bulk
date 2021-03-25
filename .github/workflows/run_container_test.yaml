@@ -5,17 +5,17 @@ on: [push, pull_request]
 jobs:
   run_test:
     runs-on: ubuntu-latest
-    container:
-      image: quay.io/ebigxa/json_schema_transform
     steps:
       - uses: actions/checkout@v2
       - name: Add workspace to path
         run: |
           echo "${GITHUB_WORKSPACE}" >> $GITHUB_PATH
+      - name: Fetch container
+        run: |
+          docker pull quay.io/ebigxa/json_schema_transform
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          auto-update-conda: true
           miniconda-version: "latest"
           activate-environment: test
           channels: bioconda
