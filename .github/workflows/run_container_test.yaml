@@ -18,7 +18,7 @@ jobs:
           auto-update-conda: true
           miniconda-version: "latest"
           activate-environment: test
-          channels: conda-forge,bioconda,defaults
+          channels: bioconda
           environment-file: test_environment.yaml
 
       - name: Run test script
