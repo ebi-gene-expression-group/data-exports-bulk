@@ -34,4 +34,13 @@ Optional variables:
 - `OUTPUT_DIR` - specify absolute path to output directory
 - `IMAGE_NAME` - specify Docker image name to be used
 
+It might be needed to filter out evidence strings which do not have certain fields. To do so, run 
+```
+bin/run_json_filtering.sh $json_to_process $ensembl_genes $excluded_biotypes
+```
+the arguments are: 
+- `json_to_process` - Initial txt file with multiple json objects (one per line)
+- `ensembl_genes` - Table with E! gene annotation (see `test_data` for an example)
+- `excluded_biotypes` - Text file with excluded biotypes which need to be filtered out (see `data` directory)
+
 
