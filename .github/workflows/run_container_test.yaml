@@ -14,7 +14,9 @@ jobs:
           echo "${GITHUB_WORKSPACE}" >> $GITHUB_PATH
 
       - uses: conda-incubator/setup-miniconda@v2
+      - name: Set up conda environment for testing 
         with:
+          miniconda-version: "latest"
           activate-environment: test
           environment-file: test-environment.yml
 
