@@ -1,0 +1,34 @@
+name: Test JSON schema transforation in container 
+
+on: [push, pull_request]
+
+jobs:
+  run_test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Add workspace to path
+        run: |
+          echo "${GITHUB_WORKSPACE}" >> $GITHUB_PATH
+      - name: Fetch container
+        run: |
+          docker pull quay.io/ebigxa/json_schema_transform
+
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
+          activate-environment: test
+          channels: bioconda
+          environment-file: test_environment.yaml
+      
+      - name: Activate environment 
+        run: conda activate test
+
+      - run: conda list 
+
+      - name: Run test script
+        run: |
+          run_tests.sh  
