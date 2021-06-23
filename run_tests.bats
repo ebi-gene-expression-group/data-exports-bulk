@@ -11,5 +11,8 @@
 @test "Run enrichEBEyeXMLDump doctests" {
     run pytest bin/enrichEBEyeXMLDump.py
     
+    echo "status = ${status}"
+    echo "output = ${output}"
+    
     [ "$status" -eq 0 ]
 }
