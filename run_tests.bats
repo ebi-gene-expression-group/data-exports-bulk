@@ -7,3 +7,9 @@
     [ "$status" -eq 0 ]
     [ -f "outputs/processed_output.json" ]
 }
+
+@test "Run enrichEBEyeXMLDump doctests" {
+    run pytest bin/enrichEBEyeXMLDump.py
+    
+    [ "$status" -eq 0 ]
+}
