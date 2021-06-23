@@ -125,19 +125,17 @@ def addSampleAnnotationsToEntry(doc, entry, diseases, tissues, crossRefs):
 
 condensedSDRFRootDir = None
 if __name__ == "__main__":
-    if 'ATLAS_EXPS' in os.environ:
-        condensedSDRFRootDir=os.environ['ATLAS_EXPS']
-    else:
-        print("ATLAS_EXPS environment variable is not set")
-        sys.exit()
     # Capture call arguments
     if len(sys.argv) < 2:
         print('Call argument needed, e.g. : ')
-        print(sys.argv[0] + ' ebeye_baseline_experiments.xml')
+        print(sys.argv[0] + ' ebeye_baseline_experiments.xml /path/to/condensed/sdrf')
         print('or:')
         print(sys.argv[0] + ' test')
         sys.exit()
 xmlFilePath = sys.argv[1]
+if len(sys.argv) > 2:
+    condensedSDRFRootDir = sys.argv[2]
+
 if xmlFilePath == "test":
     import doctest
     doctest.testmod(verbose=False) 
