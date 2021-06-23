@@ -16,6 +16,11 @@ jobs:
       - name: Fetch container
         run: |
           docker pull quay.io/ebigxa/json_schema_transform
+          
+      - name: Setup BATS
+        uses: mig4/setup-bats@v1
+        with:
+          bats-version: 1.2.1
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
