@@ -9,7 +9,7 @@
 }
 
 @test "Run enrichEBEyeXMLDump doctests" {
-    run pytest bin/enrichEBEyeXMLDump.py
+    run chmod u+x bin/enrichEBEyeXMLDump.py && bin/enrichEBEyeXMLDump.py test
     
     echo "status = ${status}"
     echo "output = ${output}"
