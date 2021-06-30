@@ -127,7 +127,7 @@ if __name__ == "__main__":
         print('Call argument needed, e.g. : ')
         print(sys.argv[0] + ' ebeye_baseline_experiments.xml /path/to/condensed/sdrf')
         print('or:')
-        print(sys.argv[0] + ' test')
+        print(f"{sys.argv[0]} test")
         sys.exit()
 xmlFilePath = sys.argv[1]
 if len(sys.argv) > 2:
