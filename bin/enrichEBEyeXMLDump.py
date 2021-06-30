@@ -29,12 +29,11 @@ def createAppendElement(doc, parentElem, elemName, elemText, elemAttributeTuples
         el.setAttribute(attrVal[0], attrVal[1])
     parentElem.appendChild(el)
 
-"""
-Retrieve from condensedSdrfFilePath disease and tissue annotations (including cross-references 
-to ontology terms) and store them in diseases, tissues and crossRefs sets respectively.
-"""
 def retrieveSampleAnnotationsFromCondensedSdrfFile(condensedSdrfFilePath):
     """
+    Retrieve from condensedSdrfFilePath disease and tissue annotations (including cross-references 
+    to ontology terms) and store them in diseases, tissues and crossRefs sets respectively.
+
     >>> retrieveSampleAnnotationsFromCondensedSdrfFile('!')
     Traceback (most recent call last):
        ...
@@ -162,4 +161,3 @@ else:
     xmlStr = os.linesep.join([s for s in xmlStr.splitlines() if s.strip()])
     with open("%s.enriched" % xmlFilePath, "w") as f:
         f.write(xmlStr)
-
