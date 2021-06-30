@@ -86,11 +86,9 @@ def retrieveSampleAnnotationsFromCondensedSdrf(condensedSdrfStr):
                     crossRefs.add(arr[6].split("/")[-1].strip())
     return (diseases, tissues, crossRefs)
 
-"""
-Add annotations in diseases, tissues, crossRefs to entry
-"""
 def addSampleAnnotationsToEntry(doc, entry, diseases, tissues, crossRefs):
     """
+    Add annotations in diseases, tissues, crossRefs to entry
     >>> doc = minidom.Document()
     >>> entry = doc.createElement('entry')
     >>> addSampleAnnotationsToEntry(doc, entry, {'bladder carcinoma'}, {}, {'EFO_0000292'})
