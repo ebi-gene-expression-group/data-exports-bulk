@@ -15,13 +15,13 @@ import time
 class EBEyeDumpEnrichmentError(Exception):
     pass
 
-"""
-1. Create xml elemName
-2. Populate it with attributes in elemAttributeTuples, 
-3. Append to elemName a child text node elemText
-4. Append elemName as a child of parentElem
-"""
 def createAppendElement(doc, parentElem, elemName, elemText, elemAttributeTuples=[]):
+    """
+    1. Create xml elemName
+    2. Populate it with attributes in elemAttributeTuples, 
+    3. Append to elemName a child text node elemText
+    4. Append elemName as a child of parentElem
+    """
     el = doc.createElement(elemName)
     if (elemText):
         el.appendChild(doc.createTextNode(elemText))
@@ -162,5 +162,4 @@ else:
     xmlStr = os.linesep.join([s for s in xmlStr.splitlines() if s.strip()])
     with open("%s.enriched" % xmlFilePath, "w") as f:
         f.write(xmlStr)
-
 
