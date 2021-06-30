@@ -139,7 +139,7 @@ if xmlFilePath == "test":
 else:
     t0 = time.time()
     doc = minidom.parse(xmlFilePath)
-    print("Parsed %s successfully in %d seconds" % (xmlFilePath, round(time.time() - t0)))
+    print(f"Parsed {xmlFilePath} successfully in {round(time.time() - t0)} seconds")
 
     entries = doc.getElementsByTagName('entry')
     t0 = time.time()
