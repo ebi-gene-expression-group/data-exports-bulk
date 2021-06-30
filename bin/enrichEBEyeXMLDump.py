@@ -153,7 +153,7 @@ else:
                 addSampleAnnotationsToEntry(doc, entry, diseases, tissues, crossRefs)
         recCnt += 1
         if recCnt % 200 == 0:
-            print("Processed %d entries - %d seconds so far" % (recCnt, round(time.time() - t0)))
+            print(f"Processed {recCnt} entries - {round(time.time() - t0)} seconds so far")
     print("Processed %d %s entries successfully in %d seconds" % (len(entries), xmlFilePath, round(time.time() - t0)))
     xmlStr = doc.toprettyxml(indent="  ")
     xmlStr = os.linesep.join([s for s in xmlStr.splitlines() if s.strip()])
