@@ -11,6 +11,7 @@ from re import sub, match, IGNORECASE
 import os
 import sys
 import time
+import argparse
 
 class EBEyeDumpEnrichmentError(Exception):
     pass
@@ -123,39 +124,35 @@ def addSampleAnnotationsToEntry(doc, entry, diseases, tissues, crossRefs):
 condensedSDRFRootDir = None
 if __name__ == "__main__":
     # Capture call arguments
-    if len(sys.argv) < 2:
-        print('Call argument needed, e.g. : ')
-        print(sys.argv[0] + ' ebeye_baseline_experiments.xml /path/to/condensed/sdrf')
-        print('or:')
-        print(f"{sys.argv[0]} test")
-        sys.exit()
-xmlFilePath = sys.argv[1]
-if len(sys.argv) > 2:
-    condensedSDRFRootDir = sys.argv[2]
+    parser = argparse.ArgumentParser(description='Enrich file xmlpath with tissue/disease information from condensed sdrf files in condensed_sdrf_dir. Store the result in xmlpath.enriched.')
+    parser.add_argument('xml', metavar='xmlpath', nargs=1, help='Path to Atlas XML dump file for EBI Search')
+    parser.add_argument('--sdrfdir', metavar='condensed_sdrf_dir', nargs=1, help='Directory containing condensed sdrf files')
+    args = parser.parse_args()
+    xmlFilePath = args.xml[0]
+    if args.sdrfdir:
+        condensedSDRFRootDir = args.sdrfdir[0]
 
-if xmlFilePath == "test":
-    import doctest
-    doctest.testmod(verbose=False) 
-else:
-    t0 = time.time()
-    doc = minidom.parse(xmlFilePath)
-    print(f"Parsed {xmlFilePath} successfully in {round(time.time() - t0)} seconds")
+    if xmlFilePath == "test":
+        import doctest
+        doctest.testmod(verbose=False) 
+    else:
+        t0 = time.time()
+        doc = minidom.parse(xmlFilePath)
+        print(f"Parsed {xmlFilePath} successfully in {round(time.time() - t0)} seconds")
 
-    entries = doc.getElementsByTagName('entry')
-    t0 = time.time()
-    recCnt = 0
-    for entry in entries:
-        accession = entry.attributes['id'].value
-        for expAcc in os.listdir(condensedSDRFRootDir):
-            if expAcc == accession:
-                condensedSdrfFilePath = os.path.join(condensedSDRFRootDir, expAcc, "%s.condensed-sdrf.tsv" % expAcc)
-                (diseases, tissues, crossRefs) = retrieveSampleAnnotationsFromCondensedSdrfFile(condensedSdrfFilePath)
-                addSampleAnnotationsToEntry(doc, entry, diseases, tissues, crossRefs)
-        recCnt += 1
-        if recCnt % 200 == 0:
-            print(f"Processed {recCnt} entries - {round(time.time() - t0)} seconds so far")
-    print("Processed %d %s entries successfully in %d seconds" % (len(entries), xmlFilePath, round(time.time() - t0)))
-    xmlStr = doc.toprettyxml(indent="  ")
-    xmlStr = os.linesep.join([s for s in xmlStr.splitlines() if s.strip()])
-    with open("%s.enriched" % xmlFilePath, "w") as f:
-        f.write(xmlStr)
+        entries = doc.getElementsByTagName('entry')
+        t0 = time.time()
+        recCnt = 0
+        for entry in entries:
+            accession = entry.attributes['id'].value
+            condensedSdrfFilePath = os.path.join(condensedSDRFRootDir, accession, "%s.condensed-sdrf.tsv" % accession)
+            (diseases, tissues, crossRefs) = retrieveSampleAnnotationsFromCondensedSdrfFile(condensedSdrfFilePath)
+            addSampleAnnotationsToEntry(doc, entry, diseases, tissues, crossRefs)
+            recCnt += 1
+            if recCnt % 200 == 0:
+                print(f"Processed {recCnt} entries - {round(time.time() - t0)} seconds so far")
+        print("Processed %d %s entries successfully in %d seconds" % (len(entries), xmlFilePath, round(time.time() - t0)))
+        xmlStr = doc.toprettyxml(indent="  ")
+        xmlStr = os.linesep.join([s for s in xmlStr.splitlines() if s.strip()])
+        with open("%s.enriched" % xmlFilePath, "w") as f:
+            f.write(xmlStr)
