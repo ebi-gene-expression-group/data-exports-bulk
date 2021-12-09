@@ -9,7 +9,6 @@ destination=${destination:-"$ATLAS_FTP/experiments/cttv010-$(date "+%Y-%m-%d").j
 usageMessage="Usage: (-a $atlasUrl) (-p urlParams:$urlParams) (-d destination:$destination) (-o outputPath:outputPath)"
 venvPath=${venvPath:-"$ATLAS_PROD/venvs"}
 
-[ ! -z ${opentargetsValidatorVersion+x} ] || ( echo "Env var opentargetsValidatorVersion version needs to be defined." && exit 1 )
 [ ! -z ${jsonSchemaVersion+x} ] || ( echo "Env var jsonSchemaVersion needs to be defined." && exit 1 )
 
 
@@ -46,25 +45,8 @@ listExperimentsToRetrieve(){
       <( cut -f1 -d ' ' "experiments-exclude.tmp" | sort)
 }
 
-installValidator(){
-  if [ ! -f $venvPath/ot-validator/bin/activate ]; then
-    mkdir -p $venvPath
-    virtualenv $venvPath/ot-validator
-  fi
-  source $venvPath/ot-validator/bin/activate
-  pip install --upgrade pip==18.1
-  pip install --upgrade setuptools==40.6.2
-  pip install opentargets-validator=="$opentargetsValidatorVersion"
-  deactivate
-}
-
-installValidator
-source $venvPath/ot-validator/bin/activate
-
-
 rm -rf ${destination}.tmp
 touch ${destination}.tmp
-
 
 trap 'mv -fv ${destination}.tmp ${destination}.failed; exit 1' INT TERM EXIT
 
@@ -87,9 +69,6 @@ listExperimentsToRetrieve | while read -r experimentAccession ; do
   fi 
 done
 rm -rf experiments-exclude.tmp
-
-# closes virtualenv
-deactivate
 
 trap - INT TERM EXIT
 
