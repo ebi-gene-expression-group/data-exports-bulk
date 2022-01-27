@@ -91,8 +91,13 @@ listExperimentsToRetrieve | while read -r experimentAccession ; do
 done
 rm -rf experiments-exclude.tmp
 
-trap - INT TERM EXIT
+# Actually exit if the while read loop hasn't exited successfully
+if [ $? -ne 0 ]; then
+  echo "OT export failed"
+  exit 1
+fi
 
+trap - INT TERM EXIT
 
 echo "Successfully fetched and validated evidence, zipping..."
 mv -nv ${destination}.tmp $destination
