@@ -86,6 +86,7 @@ listExperimentsToRetrieve | while read -r experimentAccession ; do
     fi
   else
     echo "WARN: $experimentAccession.tmp.json empty response"
+    rm -f "$experimentAccession.tmp.json"
   fi 
 done
 rm -rf experiments-exclude.tmp
