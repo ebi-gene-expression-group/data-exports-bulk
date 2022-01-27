@@ -54,7 +54,27 @@ listExperimentsToRetrieve | while read -r experimentAccession ; do
   echo "Retrieving experiment $experimentAccession ... "
   curl -s -w "\n" "$atlasUrl/json/experiments/$experimentAccession/evidence?$urlParams" | grep -v -e '^[[:space:]]*$' > $experimentAccession.tmp.json
   if [ -s "$experimentAccession.tmp.json" ]; then
-    opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/${jsonSchemaVersion}/opentargets.json $experimentAccession.tmp.json 2>$experimentAccession.err
+  
+    # The OT validator seems to randomly hang in an unpredictable way, 
+    # which I think may have to do with pypeln and multiprocessing. The 
+    # validation shouldn't take more than a couple of seconds, so time 
+    # it out and retry
+  
+    for try in 1 2 3 4 5; do
+      timeout 10 opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/${jsonSchemaVersion}/opentargets.json $experimentAccession.tmp.json 2>$experimentAccession.err
+      if [ $? -eq 124 ]; then
+        echo "Validation timed out"
+        if [ $try -eq 5 ]; then
+          echo "Validation of $experimentAccession hung too many times, failing" 1>&2
+          exit 1
+        else
+          echo "Trying again ($try)" 1>&2
+        fi
+      else
+        break
+      fi
+    done
+    
     if [ $(wc -l < $experimentAccession.err) -eq 0 ]; then
       cat $experimentAccession.tmp.json >> ${destination}.tmp
       rm $experimentAccession.tmp.json
