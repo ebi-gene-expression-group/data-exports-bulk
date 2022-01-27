@@ -100,8 +100,7 @@ fi
 trap - INT TERM EXIT
 
 echo "Successfully fetched and validated evidence, zipping..."
-mv -nv ${destination}.tmp $destination
-gzip $destination
+mv -nv ${destination}.tmp $destination && rm -f ${$destination}.gz && gzip $destination
 
 echo "Sanity check .."
 "$scriptDir/ot_json_queries_stats.sh" -j ${destination}.gz -o $outputPath
