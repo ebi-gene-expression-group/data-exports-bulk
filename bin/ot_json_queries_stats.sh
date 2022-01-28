@@ -28,36 +28,36 @@ echo "Output path: $outputPath"
 file_name=$(basename $jsonDump | sed 's/[.].*//')
 
 json_dump_stats(){
-	json_file=$1
-    outputPath=$2
+  json_file=$1
+  outputPath=$2
 
-	file_name=$(basename $json_file | sed 's/[.].*//')
+  file_name=$(basename $json_file | sed 's/[.].*//')
 
- 	# retrieve evidences
- 	zless $json_file | jq '.evidence.unique_experiment_reference' | sort  > $outputPath/${file_name}_experiments.txt
+  # retrieve evidences
+  zcat $json_file | jq '.evidence.unique_experiment_reference' | sort  > $outputPath/${file_name}_experiments.txt
 
- 	# number of microarray that has probe id field.
- 	zless $json_file | jq '.unique_association_fields | select( has("probe_id"))' | grep "study_id"  \
-  		| grep  -oe 'E-[[:upper:]]*-[[:digit:]]*' | sort -u > $outputPath/${file_name}_micoarray.txt
+  # number of microarray that has probe id field.
+  zcat $json_file | jq '.unique_association_fields | select( has("probe_id"))' | grep "study_id"  \
+     | grep  -oe 'E-[[:upper:]]*-[[:digit:]]*' | sort -u > $outputPath/${file_name}_micoarray.txt
 
- 	# log fold change of each evidence.
- 	zless $json_file | jq '.evidence.log2_fold_change.value' >  $outputPath/${file_name}_log_fold_changes.txt
+  # log fold change of each evidence.
+  zcat $json_file | jq '.evidence.log2_fold_change.value' >  $outputPath/${file_name}_log_fold_changes.txt
 
- 	# pvalues of each evidence.
- 	zless $json_file | jq '.evidence.resource_score.value' >  $outputPath/${file_name}_pvalue.txt
+  # pvalues of each evidence.
+  zcat $json_file | jq '.evidence.resource_score.value' >  $outputPath/${file_name}_pvalue.txt
 
- 	# tabulate contrast experiments and genes associated with each study.
-	zless $json_file | jq '.unique_association_fields | .comparison_name + "  " + .study_id + "  " + .geneID' > $outputPath/${file_name}_contrast_exp_gene.txt
+  # tabulate contrast experiments and genes associated with each study.
+  zcat $json_file | jq '.unique_association_fields | .comparison_name + "  " + .study_id + "  " + .geneID' > $outputPath/${file_name}_contrast_exp_gene.txt
 
-	file_contrast=$outputPath/${file_name}_contrast_exp_gene.txt
-	exp=$(cat $file_contrast | awk -F"  " '{print $2}' | grep  -oe 'E-[[:upper:]]*-[[:digit:]]*' | sort -u)
-	for expAcc in $exp; do
-   		contrast=$(cat $file_contrast | grep "$expAcc" | awk -F"  " '{print $1}' | sort -u)
-      		for cont in $(echo -e $contrast | tr "\"" "\n" | sed '/^$/d'); do
-        			ngenes=$(cat $file_contrast | grep "$expAcc" | grep -F "$cont" | wc -l)
-         			echo -e "$expAcc\t$cont\t$ngenes"
-      		done
-	done
+  file_contrast=$outputPath/${file_name}_contrast_exp_gene.txt
+  exp=$(cat $file_contrast | awk -F"  " '{print $2}' | grep  -oe 'E-[[:upper:]]*-[[:digit:]]*' | sort -u)
+  for expAcc in $exp; do
+    contrast=$(cat $file_contrast | grep "$expAcc" | awk -F"  " '{print $1}' | sort -u)
+    for cont in $(echo -e $contrast | tr "\"" "\n" | sed '/^$/d'); do
+      ngenes=$(cat $file_contrast | grep "$expAcc" | grep -F "$cont" | wc -l)
+      echo -e "$expAcc\t$cont\t$ngenes"
+    done
+  done
 }
 
 IFS="
