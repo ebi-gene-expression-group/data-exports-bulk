@@ -63,7 +63,7 @@ listExperimentsToRetrieve | while read -r experimentAccession ; do
     for try in 1 2 3 4 5; do
       timeout 10 opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/${jsonSchemaVersion}/opentargets.json $experimentAccession.tmp.json 2>$experimentAccession.err
       if [ $? -eq 124 ]; then
-        echo "Validation timed out"
+        echo "Validation of $experimentAccession timed out" 1>&2
         if [ $try -eq 5 ]; then
           echo "Validation of $experimentAccession hung too many times, failing" 1>&2
           exit 1
@@ -89,7 +89,6 @@ listExperimentsToRetrieve | while read -r experimentAccession ; do
     rm -f "$experimentAccession.tmp.json"
   fi 
 done
-rm -rf experiments-exclude.tmp
 
 # Actually exit if the while read loop hasn't exited successfully
 if [ $? -ne 0 ]; then
@@ -97,10 +96,12 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+rm -rf experiments-exclude.tmp
+
 trap - INT TERM EXIT
 
 echo "Successfully fetched and validated evidence, zipping..."
-mv -nv ${destination}.tmp $destination && rm -f ${$destination}.gz && gzip $destination
+mv ${destination}.tmp $destination && gzip $destination
 
 echo "Sanity check .."
 "$scriptDir/ot_json_queries_stats.sh" -j ${destination}.gz -o $outputPath
