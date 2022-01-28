@@ -63,7 +63,7 @@ listExperimentsToRetrieve | while read -r experimentAccession ; do
     for try in 1 2 3 4 5; do
       timeout 10 opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/${jsonSchemaVersion}/opentargets.json $experimentAccession.tmp.json 2>$experimentAccession.err
       if [ $? -eq 124 ]; then
-        echo "Validation timed out"
+        echo "Validation of $experimentAccession timed out" 1>&2
         if [ $try -eq 5 ]; then
           echo "Validation of $experimentAccession hung too many times, failing" 1>&2
           exit 1
