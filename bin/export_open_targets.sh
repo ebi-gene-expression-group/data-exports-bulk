@@ -50,9 +50,12 @@ touch ${destination}.tmp
 
 trap 'mv -fv ${destination}.tmp ${destination}.failed; exit 1' INT TERM EXIT
 
-listExperimentsToRetrieve | while read -r experimentAccession ; do
+failed_exps=''
+
+while read -r experimentAccession ; do
+  evidenceURI="$atlasUrl/json/experiments/$experimentAccession/evidence?$urlParams"
   echo "Retrieving experiment $experimentAccession ... "
-  curl -s -w "\n" "$atlasUrl/json/experiments/$experimentAccession/evidence?$urlParams" | grep -v -e '^[[:space:]]*$' > $experimentAccession.tmp.json
+  curl -s -w "\n" "$evidenceURI" | grep -v -e '^[[:space:]]*$' > $experimentAccession.tmp.json
   if [ -s "$experimentAccession.tmp.json" ]; then
   
     # The OT validator seems to randomly hang in an unpredictable way, 
@@ -80,19 +83,19 @@ listExperimentsToRetrieve | while read -r experimentAccession ; do
       rm $experimentAccession.tmp.json
       rm $experimentAccession.err
     else
-      echo "$experimentAccession failed validation."
+      echo "$experimentAccession failed validation. See JSON at $evidenceURI"
       cat $experimentAccession.err
-      exit 1
+      failed_exps="$failed_exps\n$experimentAccession"
     fi
   else
     echo "WARN: $experimentAccession.tmp.json empty response"
     rm -f "$experimentAccession.tmp.json"
   fi 
-done
+done <<<$(listExperimentsToRetrieve)
 
 # Actually exit if the while read loop hasn't exited successfully
-if [ $? -ne 0 ]; then
-  echo "OT export failed"
+if [ -n "$failed_exps" ]; then
+  echo -e "OT export failed, failing experiments are: $failed_exps"
   exit 1
 fi
 
