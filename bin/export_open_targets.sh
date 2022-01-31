@@ -95,7 +95,7 @@ done <<<$(listExperimentsToRetrieve)
 
 # Actually exit if the while read loop hasn't exited successfully
 if [ -n "$failed_exps" ]; then
-  echo "OT export failed, failing experiments are: $failed_exps"
+  echo -e "OT export failed, failing experiments are: $failed_exps"
   exit 1
 fi
 
