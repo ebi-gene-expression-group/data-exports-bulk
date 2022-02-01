@@ -872,6 +872,24 @@ sub download_atlas_details {
   return $details;
 }
 
+# Simple routine that returns public or private
+
+sub get_privacy{
+  
+  my ( $expId ) =  @_;
+
+  my $url = "http://peach.ebi.ac.uk:8480/api/privacy.txt?acc=$expId";
+  my $ua = LWP::UserAgent->new;
+  my $response = $ua->get($url)->content;
+  my ($privacy) = $response =~ m/privacy:(\w+)\s/g;
+
+  if ($privacy ne 'public' && $privacy ne 'private'){
+    $logger->logdie( "Can't get valid privacty for \"$expId\"" );
+  }
+
+  return $privacy;
+}
+
 # make_factors_2_values
 #   - Here get the (unique) factor-factor value pairs for this gene by
 #   joining info from the database (in $H_geneIDs2expts2contrasts or $H_geneIDs2expts2assayGroups) and
@@ -920,9 +938,12 @@ sub make_factors_2_values {
         # Log the accession and die.
         else {
           if (! exists $contrastDetailsMissing{ $exptAcc }){
-            $logger->warn( "$exptAcc found in database but not found in Atlas details file." );
+            my $privacy = get_privacy( $exptAcc );
+            if ($privacy eq 'public'){
+              $logger->warn( "$exptAcc found in database but not found in Atlas details file." );
+            } 
+            $contrastDetailsMissing{$exptAcc} = $privacy
           }
-          $contrastDetailsMissing{$exptAcc} = 1
           next;
         }
       }
