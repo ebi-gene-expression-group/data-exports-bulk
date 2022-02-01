@@ -937,12 +937,12 @@ sub make_factors_2_values {
         # $H_expts2atlasIDs2factors hash, something odd is going on.
         # Log the accession and die.
         else {
-          if (! exists $contrastDetailsMissing{ $exptAcc }){
+          if (! exists $contrastDetailsMissing->{ $exptAcc }){
             my $privacy = get_privacy( $exptAcc );
             if ($privacy eq 'public'){
               $logger->warn( "$exptAcc found in database but not found in Atlas details file." );
             } 
-            $contrastDetailsMissing{$exptAcc} = $privacy
+            $contrastDetailsMissing->{$exptAcc} = $privacy
           }
           next;
         }
