@@ -887,6 +887,7 @@ sub make_factors_2_values {
   my ($geneID, $H_geneIDs2expts2atlasIDs, $H_expts2atlasIDs2factors) = @_;
 
   my $H_factors2values = {};
+  my $contrastDetailsMissing = {};
 
   if(exists($H_geneIDs2expts2atlasIDs->{ $geneID })) {
     # Go through the accessions for this gene.
@@ -918,7 +919,10 @@ sub make_factors_2_values {
         # $H_expts2atlasIDs2factors hash, something odd is going on.
         # Log the accession and die.
         else {
-          $logger->warn( "$exptAcc found in database but not found in Atlas details file." );
+          if (! exists $contrastDetailsMissing{ $exptAcc }){
+            $logger->warn( "$exptAcc found in database but not found in Atlas details file." );
+          }
+          $contrastDetailsMissing{$exptAcc} = 1
           next;
         }
       }
