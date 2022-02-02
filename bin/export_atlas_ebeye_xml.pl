@@ -883,7 +883,7 @@ sub get_privacy{
   
   my ( $expId ) =  @_;
 
-  if ( ! exists $exptPrivacies{ $expId } ){
+  if ( ! exists $exptPrivacies->{ $expId } ){
     my $url = "http://peach.ebi.ac.uk:8480/api/privacy.txt?acc=$expId";
     my $ua = LWP::UserAgent->new;
     my $response = $ua->get($url)->content;
@@ -897,9 +897,9 @@ sub get_privacy{
         $logger->logdie( "Invalid privacy \"$privacy\" for \"$expId\"" );
       }
     }
-    $exptPrivacies{ $expId } = $privacy;
+    $exptPrivacies->{ $expId } = $privacy;
   }
-  return $exptPrivacies{ $expId };
+  return $exptPrivacies->{ $expId };
 }
 
 # make_factors_2_values
