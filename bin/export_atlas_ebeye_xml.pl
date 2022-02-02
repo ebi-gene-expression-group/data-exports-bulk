@@ -884,7 +884,12 @@ sub get_privacy{
   my ($privacy) = $response =~ m/privacy:(\w+)\s/g;
 
   if ($privacy ne 'public' && $privacy ne 'private'){
-    $logger->logdie( "Can't get valid privacty for \"$expId\"" );
+    if (! $privacy){
+      $privacy='unknown';
+    }
+    else{
+      $logger->logdie( "Invalid privacy \"$privacy\" for \"$expId\"" );
+    }
   }
 
   return $privacy;
@@ -939,16 +944,24 @@ sub make_factors_2_values {
         else {
           if (! exists $contrastDetailsMissing->{ $exptAcc }){
             my $privacy = get_privacy( $exptAcc );
+            my $msg = "$exptAcc found in database but not found in Atlas details file.";
+   
+            # If exp is private don't error- that is the reason it's missing.
+ 
             if ($privacy eq 'public'){
-              $logger->warn( "$exptAcc found in database but not found in Atlas details file." );
+              $logger->warn( "$msg" );
+            }
+            elsif ($privacy eq 'unknown'){
+              $logger->warn( "$msg Privacy status for this experiment is unknown- has it been withdrawn?");
             } 
-            $contrastDetailsMissing->{$exptAcc} = $privacy
+            $contrastDetailsMissing->{$exptAcc} = $privacy;
           }
           next;
         }
       }
     }
   }
+
   return $H_factors2values;
 }
 
