@@ -889,13 +889,11 @@ sub get_privacy{
     my $response = $ua->get($url)->content;
     my ($privacy) = $response =~ m/privacy:(\w+)\s/g;
 
-    if ($privacy ne 'public' && $privacy ne 'private'){
-      if (! $privacy){
-        $privacy='unknown';
-      }
-      else{
-        $logger->logdie( "Invalid privacy \"$privacy\" for \"$expId\"" );
-      }
+    if (! $privacy ){
+      $privacy='unknown';
+    }
+    elsif ($privacy ne 'public' && $privacy ne 'private'){
+      $logger->logdie( "Invalid privacy \"$privacy\" for \"$expId\"" );
     }
     $exptPrivacies->{ $expId } = $privacy;
   }
