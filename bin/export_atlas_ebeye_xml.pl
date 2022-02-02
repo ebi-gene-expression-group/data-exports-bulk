@@ -172,6 +172,11 @@ get_and_write_experiments_info($configHash);
 # with actual entry counts.
 add_entry_count( $configHash );
 
+# Some global variables to ensure errors aren't re-printed a gazillion times
+my $contrastDetailsMissing = {};
+my $atlasIDMissing = {};
+my $exptPrivacies = {};
+
 # end
 #####
 
@@ -878,21 +883,23 @@ sub get_privacy{
   
   my ( $expId ) =  @_;
 
-  my $url = "http://peach.ebi.ac.uk:8480/api/privacy.txt?acc=$expId";
-  my $ua = LWP::UserAgent->new;
-  my $response = $ua->get($url)->content;
-  my ($privacy) = $response =~ m/privacy:(\w+)\s/g;
+  if ( ! exists $exptPrivacies{ $expId } ){
+    my $url = "http://peach.ebi.ac.uk:8480/api/privacy.txt?acc=$expId";
+    my $ua = LWP::UserAgent->new;
+    my $response = $ua->get($url)->content;
+    my ($privacy) = $response =~ m/privacy:(\w+)\s/g;
 
-  if ($privacy ne 'public' && $privacy ne 'private'){
-    if (! $privacy){
-      $privacy='unknown';
+    if ($privacy ne 'public' && $privacy ne 'private'){
+      if (! $privacy){
+        $privacy='unknown';
+      }
+      else{
+        $logger->logdie( "Invalid privacy \"$privacy\" for \"$expId\"" );
+      }
     }
-    else{
-      $logger->logdie( "Invalid privacy \"$privacy\" for \"$expId\"" );
-    }
+    $exptPrivacies{ $expId } = $privacy;
   }
-
-  return $privacy;
+  return $exptPrivacies{ $expId };
 }
 
 # make_factors_2_values
@@ -910,7 +917,6 @@ sub make_factors_2_values {
   my ($geneID, $H_geneIDs2expts2atlasIDs, $H_expts2atlasIDs2factors) = @_;
 
   my $H_factors2values = {};
-  my $contrastDetailsMissing = {};
 
   if(exists($H_geneIDs2expts2atlasIDs->{ $geneID })) {
     # Go through the accessions for this gene.
@@ -925,7 +931,10 @@ sub make_factors_2_values {
         if(exists($H_expts2atlasIDs2factors->{ $exptAcc })) {
           # Check that the ID exists in $H_expts2atlasIDs2factors
           unless(exists($H_expts2atlasIDs2factors->{ $exptAcc }->{ $atlasID })) {
-            $logger->warn( "ID $atlasID in experiment $exptAcc found in database but not in Atlas details file." );
+            if (! exists $atlasIDMissing->{ $exptAcc }->{ $atlasID }){
+                $logger->warn( "ID $atlasID in experiment $exptAcc found in database but not in Atlas details file." );
+                $atlasIDMissing->{$exptAcc}->{ $atlasID } = 1;
+            }
             next;
           }
 
