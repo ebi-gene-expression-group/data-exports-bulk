@@ -303,7 +303,9 @@ sub fetch_experiment_title_from_webapi {
     $json_hash = parse_json(decode ('UTF-8', $response->content));
   }
   else {
-    die $response->status_line;
+    my $status_line=$response->status_line;
+    $logger->warn( "Was unable to get title for $exp from $abs_url: $status_line" );
+    return;  
   }
 
   $expTitle = $json_hash->{'experiment'}->{'description'};
@@ -716,17 +718,33 @@ sub get_and_write_experiments_info {
   my $H_differentialExperimentsInfo = $atlasDB->fetch_differential_experiment_info_from_atlasdb( $logger );
   my $H_baselineExperimentsInfo = $atlasDB->fetch_baseline_experiment_info_from_atlasdb( $logger );
 
+  my $title_errors = 0;i
+
   # populate $H_differentialExperimentsInfo with experiment titles for each differential study
   foreach my $expAcc ( keys %{ $H_differentialExperimentsInfo } ) {
     my $title = fetch_experiment_title_from_webapi( $expAcc, $logger );
-    $H_differentialExperimentsInfo->{ $expAcc }->{ "title" } = $title;
+    if ( $title ){
+      $H_differentialExperimentsInfo->{ $expAcc }->{ "title" } = $title;
+    }
+    else{
+      $title_errors++;
+    }
   } 
 
   # populate $H_differentialExperimentsInfo with experiment titles for each baseline study
   foreach my $expAcc ( keys %{ $H_baselineExperimentsInfo } ) {
     my $title = fetch_experiment_title_from_webapi( $expAcc, $logger );
-    $H_baselineExperimentsInfo->{ $expAcc }->{ "title" } = $title;
+    if ( $title ){
+      $H_baselineExperimentsInfo->{ $expAcc }->{ "title" } = $title;
+    }
+    else{
+      $title_errors++;
+    }
   } 
+
+  if ( $title_errors > 0 ){
+    die "$title_errors experiments had no title available";
+  }
 
   # Disconnect from Atlas DB.
   $atlasDB->get_dbh->disconnect;
