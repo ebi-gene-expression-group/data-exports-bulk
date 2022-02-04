@@ -718,7 +718,7 @@ sub get_and_write_experiments_info {
   my $H_differentialExperimentsInfo = $atlasDB->fetch_differential_experiment_info_from_atlasdb( $logger );
   my $H_baselineExperimentsInfo = $atlasDB->fetch_baseline_experiment_info_from_atlasdb( $logger );
 
-  my $title_errors = 0;i
+  my $title_errors = 0;
 
   # populate $H_differentialExperimentsInfo with experiment titles for each differential study
   foreach my $expAcc ( keys %{ $H_differentialExperimentsInfo } ) {
