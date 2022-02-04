@@ -159,14 +159,14 @@ my $baselineSolrURL = "http://".$ENV{'SOLR_HOST'}."/solr/bulk-analytics-v1/expor
 # URL for differential analytics from solr
 my $differentialSolrURL = "http://".$ENV{'SOLR_HOST'}."/solr/bulk-analytics-v1/export?omitHeader=true&fq=fold_change:([* TO +1.0] OR [1.0 TO *])+AND+p_value:[0 TO 0.05]&q=*:*&sort=bioentity_identifier+asc&fl=bioentity_identifier,experiment_accession,contrast_id";
 
-# Get info from DB and write XMLs for baseline and differential experiment info.
-get_and_write_experiments_info($configHash);
-
 my ($H_geneIDs2expts2contrasts, $H_geneIDs2expts2assayGroups) = get_data_from_solr_db($baselineSolrURL, $differentialSolrURL);
 
 # Get baseline and differential expression data from Atlas database and TSV
 # files, and write XML dump files.
 get_and_write_expression_data_xml($configHash);
+
+# Get info from DB and write XMLs for baseline and differential experiment info.
+get_and_write_experiments_info($configHash);
 
 # In baseline and differential genes files, replace entry count placeholder
 # with actual entry counts.
