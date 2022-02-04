@@ -304,7 +304,7 @@ sub fetch_experiment_title_from_webapi {
   }
   else {
     my $status_line=$response->status_line;
-    $logger->warn( "Was unable to get title for $exp from $abs_url: $status_line" );
+    $logger->warn( "Was unable to get title for $expAcc from $abs_url: $status_line" );
     return;  
   }
 
