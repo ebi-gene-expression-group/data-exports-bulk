@@ -92,13 +92,17 @@ done <<<$(listExperimentsToRetrieve)
 
 # Actually exit if the while read loop hasn't exited successfully
 if [ -n "$failed_exps" ]; then
-  echo -e "WARN: OT export failed, failing experiments are: $failed_exps"
+  echo -e "WARN: OT export failed, failing experiments are: $failed_exps\nFinalising outputs anyway..."
+else
+  echo "Successfully fetched and validated evidence, zipping..."
 fi
 
 rm -rf experiments-exclude.tmp
-
-echo "Successfully fetched and validated evidence, zipping..."
 mv ${destination}.tmp $destination && gzip $destination
 
 echo "Sanity check .."
 "$scriptDir/ot_json_queries_stats.sh" -j ${destination}.gz -o $outputPath
+
+if [ -n "$failed_exps" ]; then
+  exit 1
+fi
