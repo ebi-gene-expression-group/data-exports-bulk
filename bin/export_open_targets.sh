@@ -48,8 +48,6 @@ listExperimentsToRetrieve(){
 rm -rf ${destination}.tmp
 touch ${destination}.tmp
 
-trap 'mv -fv ${destination}.tmp ${destination}.failed; exit 1' INT TERM EXIT
-
 failed_exps=''
 
 while read -r experimentAccession ; do
@@ -63,13 +61,12 @@ while read -r experimentAccession ; do
     # validation shouldn't take more than a couple of seconds, so time 
     # it out and retry
   
-    for try in 1 2 3 4 5; do
+    for try in 1 2 3 4 5 6 7 8 9 10; do
       timeout 10 opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/${jsonSchemaVersion}/opentargets.json $experimentAccession.tmp.json 2>$experimentAccession.err
       if [ $? -eq 124 ]; then
         echo "Validation of $experimentAccession timed out" 1>&2
-        if [ $try -eq 5 ]; then
-          echo "Validation of $experimentAccession hung too many times, failing" 1>&2
-          exit 1
+        if [ $try -eq 10 ]; then
+          echo "WARN: Validation of $experimentAccession hung too many times, skipping" 1>&2
         else
           echo "Trying again ($try)" 1>&2
         fi
@@ -95,16 +92,17 @@ done <<<$(listExperimentsToRetrieve)
 
 # Actually exit if the while read loop hasn't exited successfully
 if [ -n "$failed_exps" ]; then
-  echo -e "OT export failed, failing experiments are: $failed_exps"
-  exit 1
+  echo -e "WARN: OT export failed, failing experiments are: $failed_exps\nFinalising outputs anyway..."
+else
+  echo "Successfully fetched and validated evidence, zipping..."
 fi
 
 rm -rf experiments-exclude.tmp
-
-trap - INT TERM EXIT
-
-echo "Successfully fetched and validated evidence, zipping..."
 mv ${destination}.tmp $destination && gzip $destination
 
 echo "Sanity check .."
 "$scriptDir/ot_json_queries_stats.sh" -j ${destination}.gz -o $outputPath
+
+if [ -n "$failed_exps" ]; then
+  exit 1
+fi
