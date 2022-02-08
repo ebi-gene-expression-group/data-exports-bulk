@@ -101,7 +101,7 @@ rm -rf experiments-exclude.tmp
 mv ${destination}.tmp $destination
 
 echo "Sanity check .."
-"$scriptDir/ot_json_queries_stats.sh" -j ${destination} -o $outputPath
+$scriptDir/ot_json_queries_stats.sh -j ${destination} -o $outputPath
 
 # filter out based on biotypes
 json_to_process=${destination}.
