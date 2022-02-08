@@ -12,6 +12,7 @@ import os
 import sys
 import time
 import argparse
+import codecs
 
 class EBEyeDumpEnrichmentError(Exception):
     pass
@@ -137,7 +138,9 @@ if __name__ == "__main__":
         doctest.testmod(verbose=False) 
     else:
         t0 = time.time()
-        doc = minidom.parse(xmlFilePath)
+        with codecs.open(xmlFilePath, "r", encoding='Windows-1252') as xml:
+            doc = minidom.parse(xml)
+
         print(f"Parsed {xmlFilePath} successfully in {round(time.time() - t0)} seconds")
 
         entries = doc.getElementsByTagName('entry')
