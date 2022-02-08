@@ -34,20 +34,20 @@ json_dump_stats(){
   file_name=$(basename $json_file | sed 's/[.].*//')
 
   # retrieve evidences
-  zcat $json_file | jq '.evidence.unique_experiment_reference' | sort  > $outputPath/${file_name}_experiments.txt
+  cat $json_file | jq '.evidence.unique_experiment_reference' | sort  > $outputPath/${file_name}_experiments.txt
 
   # number of microarray that has probe id field.
-  zcat $json_file | jq '.unique_association_fields | select( has("probe_id"))' | grep "study_id"  \
+  cat $json_file | jq '.unique_association_fields | select( has("probe_id"))' | grep "study_id"  \
      | grep  -oe 'E-[[:upper:]]*-[[:digit:]]*' | sort -u > $outputPath/${file_name}_micoarray.txt
 
   # log fold change of each evidence.
-  zcat $json_file | jq '.evidence.log2_fold_change.value' >  $outputPath/${file_name}_log_fold_changes.txt
+  cat $json_file | jq '.evidence.log2_fold_change.value' >  $outputPath/${file_name}_log_fold_changes.txt
 
   # pvalues of each evidence.
-  zcat $json_file | jq '.evidence.resource_score.value' >  $outputPath/${file_name}_pvalue.txt
+  cat $json_file | jq '.evidence.resource_score.value' >  $outputPath/${file_name}_pvalue.txt
 
   # tabulate contrast experiments and genes associated with each study.
-  zcat $json_file | jq '.unique_association_fields | .comparison_name + "  " + .study_id + "  " + .geneID' > $outputPath/${file_name}_contrast_exp_gene.txt
+  cat $json_file | jq '.unique_association_fields | .comparison_name + "  " + .study_id + "  " + .geneID' > $outputPath/${file_name}_contrast_exp_gene.txt
 
   file_contrast=$outputPath/${file_name}_contrast_exp_gene.txt
   exp=$(cat $file_contrast | awk -F"  " '{print $2}' | grep  -oe 'E-[[:upper:]]*-[[:digit:]]*' | sort -u)
