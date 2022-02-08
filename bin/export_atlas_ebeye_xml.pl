@@ -296,21 +296,25 @@ sub fetch_experiment_title_from_webapi {
   my $abs_url = join("/",$url,$expAcc);
   my $ua = LWP::UserAgent->new;
   my $response;
-  $response =  $ua->get($abs_url);
+
   $logger->info( "Querying for experiment titles for $expAcc" );
-
-  if ($response->is_success) {
-    $json_hash = parse_json(decode ('UTF-8', $response->content));
+  
+  for ( 1 .. 5 ) {
+    $response =  $ua->get($abs_url);
+    if ($response->is_success) {
+        $json_hash = parse_json(decode ('UTF-8', $response->content));
+        $expTitle = $json_hash->{'experiment'}->{'description'};
+        return $expTitle;
+    }
+    else {
+        $logger->warn( "Attempt failed, retrying..." );
+        sleep(5);
+    }
   }
-  else {
-    my $status_line=$response->status_line;
-    $logger->warn( "Was unable to get title for $expAcc from $abs_url: $status_line" );
-    return;  
-  }
 
-  $expTitle = $json_hash->{'experiment'}->{'description'};
-
-  return $expTitle;
+  my $status_line=$response->status_line;
+  $logger->warn( "Was unable to get title for $expAcc from $abs_url: $status_line" );
+  return;  
 }
 
 # get_and_write_expression_data_xml
