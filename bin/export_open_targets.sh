@@ -125,4 +125,4 @@ if [ -n "$failed_exps" ]; then
   exit 1
 fi
 
-bz2 $OUTPUT_DIR/$PROCESSED_JSON
+bzip2 $OUTPUT_DIR/$PROCESSED_JSON
