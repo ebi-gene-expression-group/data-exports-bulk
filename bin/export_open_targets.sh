@@ -55,12 +55,12 @@ while read -r experimentAccession ; do
   echo "Retrieving experiment $experimentAccession ... "
   curl -s -w "\n" "$evidenceURI" | grep -v -e '^[[:space:]]*$' > $experimentAccession.tmp.json
   if [ -s "$experimentAccession.tmp.json" ]; then
-  
-    # The OT validator seems to randomly hang in an unpredictable way, 
-    # which I think may have to do with pypeln and multiprocessing. The 
-    # validation shouldn't take more than a couple of seconds, so time 
+
+    # The OT validator seems to randomly hang in an unpredictable way,
+    # which I think may have to do with pypeln and multiprocessing. The
+    # validation shouldn't take more than a couple of seconds, so time
     # it out and retry
-  
+
     for try in 1 2 3 4 5 6 7 8 9 10; do
       timeout 10 opentargets_validator --schema https://raw.githubusercontent.com/opentargets/json_schema/${jsonSchemaVersion}/opentargets.json $experimentAccession.tmp.json 2>$experimentAccession.err
       if [ $? -eq 124 ]; then
@@ -74,7 +74,7 @@ while read -r experimentAccession ; do
         break
       fi
     done
-    
+
     if [ $(wc -l < $experimentAccession.err) -eq 0 ]; then
       cat $experimentAccession.tmp.json >> ${destination}.tmp
       rm $experimentAccession.tmp.json
@@ -87,22 +87,42 @@ while read -r experimentAccession ; do
   else
     echo "WARN: $experimentAccession.tmp.json empty response"
     rm -f "$experimentAccession.tmp.json"
-  fi 
+  fi
 done <<<$(listExperimentsToRetrieve)
 
 # Actually exit if the while read loop hasn't exited successfully
 if [ -n "$failed_exps" ]; then
   echo -e "WARN: OT export failed, failing experiments are: $failed_exps\nFinalising outputs anyway..."
 else
-  echo "Successfully fetched and validated evidence, zipping..."
+  echo "Successfully fetched and validated evidence, filtering and transforming..."
 fi
 
 rm -rf experiments-exclude.tmp
-mv ${destination}.tmp $destination && gzip $destination
+mv ${destination}.tmp $destination
 
 echo "Sanity check .."
-"$scriptDir/ot_json_queries_stats.sh" -j ${destination}.gz -o $outputPath
+$scriptDir/ot_json_queries_stats.sh -j ${destination} -o $outputPath
+
+# filter out based on biotypes
+json_to_process=${destination}.
+ensembl_genes=$ATLAS_PROD/bioentity_properties/annotations/ensembl/homo_sapiens.ensgene.tsv
+excluded_biotypes=$scriptDir/../data/excluded_biotypes.txt
+json_filtered=$( echo $json_to_process | sed s/.json/.filtered/ )".json"
+
+$scriptDir/run_json_filtering.sh $json_to_process $ensembl_genes $excluded_biotypes > $json_filtered
+
+# transform to new schema
+export INPUT_JSON=$json_filtered
+export SCHEMA_TRANSFORM=$scriptDir/../data/schema_transform.jslt
+export PROCESSED_JSON=$( echo $INPUT_JSON | sed s/.json/.transformed/ | basename )".json"
+export OUTPUT_DIR=$( dirname $json_filtered )
+export IMAGE_NAME=quay.io/ebigxa/json_schema_transform:latest
+
+$scriptDir/../run_schema_transform_container.sh singularity
 
 if [ -n "$failed_exps" ]; then
+  echo "Files ready for inspection, there was a failure, so not compressing."
   exit 1
 fi
+
+bzip2 $OUTPUT_DIR/$PROCESSED_JSON
