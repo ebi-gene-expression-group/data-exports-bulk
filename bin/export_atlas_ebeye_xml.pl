@@ -207,6 +207,11 @@ sub get_data_from_solr_db {
   return ($H_geneIDs2expts2contrasts, $H_geneIDs2expts2assayGroups);
 }
 
+sub LWP::UserAgent::get_basic_credentials {
+    my ($self, $realm, $url, $isproxy) = @_;
+ 
+    return $ENV{'SOLR_USER'}, $ENV{'SOLR_PASS'};
+}
 
 ## parse json formatted result for genes associated to experiments accessions and assay group ids.
 sub parse_json_from_solr {
