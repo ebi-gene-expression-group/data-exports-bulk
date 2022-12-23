@@ -74,6 +74,8 @@ check_env_var('BIOENTITY_PROPERTIES_ENSEMBL',"\$ATLAS_PROD/bioentity_properties/
 check_env_var('BIOENTITY_PROPERTIES_WBPS',"\$ATLAS_PROD/bioentity_properties/annotations/wbps");
 check_env_var('SOLR_HOST',"should include both host and port if needed.");
 check_env_var('WEB_API_URL',"should include api url.");
+check_env_var('SOLR_USER');
+check_env_var('SOLR_PASS');
 
 my $atlasProdDir = $ENV{ "ATLAS_PROD" };
 my $bioentity_properties_annotations_ensembl=$ENV{'BIOENTITY_PROPERTIES_ENSEMBL'};
