@@ -77,7 +77,8 @@ check_env_var('SOLR_HOST',"should include solr host.");
 check_env_var('SC_PG_DSN',"should include pg database dsn.");
 check_env_var('SC_PG_USERNAME',"should include pg database username.");
 check_env_var('SC_PG_PASSWORD',"should include pg database password.");
-
+check_env_var('SOLR_USER');
+check_env_var('SOLR_PASS');
 
 my $atlasProdDir = $ENV{ "ATLAS_PROD" };
 
@@ -124,7 +125,12 @@ get_and_write_genes_info( $configHash, $H_baselineExperimentGeneInfo, $H_baselin
 
 add_entry_count ( $configHash );
 
+sub LWP::UserAgent::get_basic_credentials {
+     my ($self, $realm, $url, $isproxy) = @_;
 
+     return $ENV{'SOLR_USER'}, $ENV{'SOLR_PASS'};
+}
+ 
 ## parse json formatted result for genes associated to experiments accessions and assay group ids.
 sub parse_json_from_solr {
 
