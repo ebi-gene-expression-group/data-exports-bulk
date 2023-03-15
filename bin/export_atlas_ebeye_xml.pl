@@ -948,10 +948,10 @@ sub get_privacy{
  	$privacy="unknown";
    
     
+    }
+  
+    $exptPrivacies->{ $expId } = $privacy;
   }
-  
-  $exptPrivacies->{ $expId } = $privacy;
-  
   return $exptPrivacies->{ $expId };
 }
 
