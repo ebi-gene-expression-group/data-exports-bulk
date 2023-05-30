@@ -913,7 +913,7 @@ sub get_privacy{
     my $privacy;
     
     if( $response->is_success ) {
-        my $data = decode_json($response->content);
+        my $data = parse_json(decode ('UTF-8', $response->content));
         my $total_hit = $data->{totalHits};
  	    if ($total_hit > 0){
             my $is_public = $data->{hits}[0]->{isPublic};
