@@ -74,6 +74,9 @@ check_env_var('BIOENTITY_PROPERTIES_ENSEMBL',"\$ATLAS_PROD/bioentity_properties/
 check_env_var('BIOENTITY_PROPERTIES_WBPS',"\$ATLAS_PROD/bioentity_properties/annotations/wbps");
 check_env_var('SOLR_HOST',"should include both host and port if needed.");
 check_env_var('WEB_API_URL',"should include api url.");
+check_env_var('AE_PG_DSN',"should include pg database dsn.");
+check_env_var('AE_PG_USERNAME',"should include pg database username.");
+check_env_var('AE_PG_PASSWORD',"should include pg database password.");
 
 my $atlasProdDir = $ENV{ "ATLAS_PROD" };
 my $bioentity_properties_annotations_ensembl=$ENV{'BIOENTITY_PROPERTIES_ENSEMBL'};
@@ -163,7 +166,20 @@ my ($H_geneIDs2expts2contrasts, $H_geneIDs2expts2assayGroups) = get_data_from_so
 
 # Get baseline and differential expression data from Atlas database and TSV
 # files, and write XML dump files.
+foreach my $key (keys %{$configHash}) {
+    my $value = $configHash->{$key};
+    if (ref $value eq 'ARRAY') {
+        print "$key => [";
+        print join(", ", @{$value});
+        print "]\n";
+    } else {
+        print "$key => $value\n";
+    }
+}
+
 get_and_write_expression_data_xml($configHash);
+
+
 
 # Get info from DB and write XMLs for baseline and differential experiment info.
 get_and_write_experiments_info($configHash);
