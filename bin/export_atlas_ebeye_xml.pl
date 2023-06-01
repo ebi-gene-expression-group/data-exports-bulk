@@ -74,7 +74,7 @@ check_env_var('BIOENTITY_PROPERTIES_ENSEMBL',"\$ATLAS_PROD/bioentity_properties/
 check_env_var('BIOENTITY_PROPERTIES_WBPS',"\$ATLAS_PROD/bioentity_properties/annotations/wbps");
 check_env_var('SOLR_HOST',"should include both host and port if needed.");
 check_env_var('WEB_API_URL',"should include api url.");
-check_env_var('AE_PG_DSN',"should include pg database dsn.");
+#check_env_var('AE_PG_DSN',"should include pg database dsn.");
 check_env_var('AE_PG_USERNAME',"should include pg database username.");
 check_env_var('AE_PG_PASSWORD',"should include pg database password.");
 
