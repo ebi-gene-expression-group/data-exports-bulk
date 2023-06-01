@@ -732,12 +732,15 @@ sub get_and_write_experiments_info {
 
   # Connect to Atlas database.
   my $atlasDB = connect_pg_atlas;
-
+$logger->info( "connect_pg_atlas done" );
+$logger->info( $atlasDB );
+    
   # Run the queries to create two hashes, one with info for baseline
   # experiments and one with info for differential experiments.
   my $H_differentialExperimentsInfo = $atlasDB->fetch_differential_experiment_info_from_atlasdb( $logger );
+  $logger->info( "fetch_differential_experiment_info_from_atlasdb done" );
   my $H_baselineExperimentsInfo = $atlasDB->fetch_baseline_experiment_info_from_atlasdb( $logger );
-
+$logger->info( "fetch_baseline_experiment_info_from_atlasdb done" );
   my $title_errors = 0;
 
   # populate $H_differentialExperimentsInfo with experiment titles for each differential study
