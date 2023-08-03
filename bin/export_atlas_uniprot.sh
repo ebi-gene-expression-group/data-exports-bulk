@@ -17,7 +17,7 @@ command -v jq &>/dev/null || { echo "jq is not installed."; exit 1; }
 
 
 atlasUniqueUniprotUrl="http://${SOLR_HOST}/solr/bulk-analytics-v1/select?facet.field=keyword_uniprot&facet=on&q=*:*&rows=0&start=0"
-ATLAS_UNIPROT_EXPORT_FILE=${$ATLAS_UNIPROT_EXPORT_FILE:-atlas_uniprot_searces.tsv}
+ATLAS_UNIPROT_EXPORT_FILE=${$ATLAS_UNIPROT_EXPORT_FILE:-atlas_uniprot_searches.tsv}
 today=$( eval date +%F_%Hh%Mm%Ss )
 datedExportFile="${ATLAS_UNIPROT_EXPORT_FILE}.${today}"
 
