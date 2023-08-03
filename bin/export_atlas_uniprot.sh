@@ -8,6 +8,12 @@
 # Caveats:
 # 1. Only works for bulk-analytics for now. There seems to be no  in scxa solr (???) still waiting for reply from devs
 # 2. Only gets 100 unique uniprot IDs...seems odd.  Still investigating this.
+# Check that relevant env vars are set
+[ -z ${SOLR_HOST+x} ] && echo "Env var SOLR_HOST needs to be defined." && exit 1
+[ -z ${SOLR_USER+x} ] && echo "Env var SOLR_USER needs to be defined." && exit 1
+[ -z ${SOLR_PASS+x} ] && echo "Env var SOLR_PASS needs to be defined." && exit 1
+
+command -v jq &>/dev/null || { echo "jq is not installed."; exit 1; }
 
 
 atlasUniqueUniprotUrl="http://${SOLR_HOST}/solr/bulk-analytics-v1/select?facet.field=keyword_uniprot&facet=on&q=*:*&rows=0&start=0"
