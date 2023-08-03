@@ -31,4 +31,4 @@ for uniprot_id in $uniprot_ids; do
 done
 
 rm -f $ATLAS_UNIPROT_EXPORT_FILE
-ln -s $ATLAS_UNIPROT_EXPORT_FILE $datedExportFile
+ln -s $datedExportFile $ATLAS_UNIPROT_EXPORT_FILE
