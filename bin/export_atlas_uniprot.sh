@@ -2,7 +2,7 @@
 
 # What this script does:
 # 1. Gets all unique UniProt IDs in Atlas bulk-analytics collection
-# 2. Generates an Atlas search linnk for each UniProt ID
+# 2. Generates an Atlas search link for each UniProt ID
 # 3. Writes everything to file
 
 # Caveats:
