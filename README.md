@@ -6,6 +6,7 @@ This module provides functionality for the Atlas Production data exports process
 - ChEBI export.
 - EBEYE export.
 - Large Atlas tar.gz export for bulk.
+- UniProt-ID export
 
 Exports are normally executed between the pre-release date and the release date,
 as they require release data loaded in a wwwdev or equivalent web deployment.
