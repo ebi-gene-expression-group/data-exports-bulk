@@ -26,7 +26,7 @@ uniprot_ids=$(curl -u $SOLR_USER:$SOLR_PASS $atlasUniqueUniprotUrl | jq '.facet_
 
 # Generate Atlas search links
 for uniprot_id in $uniprot_ids; do
-    url="https://wwwdev.ebi.ac.uk/gxa/search?geneQuery=[{%22value%22:%22${uniprot_id}%22,%20%22category%22:%22uniprot%22}]"
+    url="https://www.ebi.ac.uk/gxa/search?geneQuery=[{%22value%22:%22${uniprot_id}%22,%20%22category%22:%22uniprot%22}]"
     echo -e "${uniprot_id}\t${url}" >> $datedExportFile
 done
 
