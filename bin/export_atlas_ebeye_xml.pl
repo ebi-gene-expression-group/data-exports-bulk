@@ -906,17 +906,50 @@ sub get_privacy{
   my ( $expId ) =  @_;
 
   if ( ! exists $exptPrivacies->{ $expId } ){
-    my $url = "http://peach.ebi.ac.uk:8480/api/privacy.txt?acc=$expId";
+    my $url = "https://www.ebi.ac.uk/biostudies/api/v1/search?type=study&accession=$expId";
     my $ua = LWP::UserAgent->new;
-    my $response = $ua->get($url)->content;
-    my ($privacy) = $response =~ m/privacy:(\w+)\s/g;
+    my $response = $ua->get($url);
+    
+    my $privacy;
+    
+    if( $response->is_success ) {
+        my $data = parse_json(decode ('UTF-8', $response->content));
+        my $total_hit = $data->{totalHits};
+ 	    if ($total_hit > 0){
+            my $is_public = $data->{hits}[0]->{isPublic};
 
-    if (! $privacy ){
-      $privacy='unknown';
+            if ($is_public) {
+                $privacy="public";
+            } else {
+                $privacy="private";
+            }
+        }
+        else{
+            $logger->error(
+                "Accession ",
+                $expId,
+                " not found: \"",
+                $response->decoded_content,
+                "\". Defaulting to unknown."
+                );
+
+                $privacy="unknown";
+
+ 	    }
     }
-    elsif ($privacy ne 'public' && $privacy ne 'private'){
-      $logger->logdie( "Invalid privacy \"$privacy\" for \"$expId\"" );
+    
+    else {
+     	$logger->error(
+              "Problem querying ArrayExpress for $expId privacy status: ",
+              $response->status_line,
+              ". Defaulting to unknown."
+          );
+
+ 	$privacy="unknown";
+   
+    
     }
+  
     $exptPrivacies->{ $expId } = $privacy;
   }
   return $exptPrivacies->{ $expId };
