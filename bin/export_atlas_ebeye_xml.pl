@@ -871,7 +871,7 @@ sub get_contrast_assaygroup_details {
   foreach my $line (@assaygroupdetails) {
 
     # Split the line on tabs.
-    my @splitLine = split "\t", $line;
+    my @splitLine = split "\t", $line;   #If there are any issues in parsing or missing factors for specific experiments, those experiments will be omitted
 
     # We just want the factor lines, so skip the other lines.
     # factor/characteristic is element 2.
@@ -959,7 +959,7 @@ sub make_factors_2_values {
           # Check that the ID exists in $H_expts2atlasIDs2factors
           unless(exists($H_expts2atlasIDs2factors->{ $exptAcc }->{ $atlasID })) {
             if (! exists $atlasIDMissing->{ $exptAcc }->{ $atlasID }){
-                $logger->warn( "ID $atlasID in experiment $exptAcc found in database but not in Atlas details file." );
+                $logger->warn( "ID $atlasID in experiment $exptAcc found in database but not in Atlas details file." );  #if the experiment is found in the database but not in the Atlas details file, it logs a warning and continues
                 $atlasIDMissing->{$exptAcc}->{ $atlasID } = 1;
             }
             next;
@@ -979,7 +979,7 @@ sub make_factors_2_values {
         # Log the accession and die.
         else {
           if (! exists $contrastDetailsMissing->{ $exptAcc }){
-            my $privacy = get_privacy( $exptAcc );
+            my $privacy = get_privacy( $exptAcc );  # Ensure that the privacy status of experiments is correctly fetched 
             my $msg = "$exptAcc found in database but not found in Atlas details file.";
    
             # If exp is private don't error- that is the reason it's missing.
@@ -1006,7 +1006,7 @@ sub make_factors_2_values {
 sub add_experiments_info {
   my ($writer, $H_experimentsInfo) = @_;
 
-  foreach my $exptAcc (keys %{ $H_experimentsInfo }) {
+  foreach my $exptAcc (keys %{ $H_experimentsInfo }) {    # If there is an issue in gathering metadata for some experiment accessions ($H_experimentsInfo), those entries might be skipped in the output
     # Start the entry for this experiment.
     # Add the accession as the "id".
     $writer->startTag("entry", "id" => $exptAcc);
