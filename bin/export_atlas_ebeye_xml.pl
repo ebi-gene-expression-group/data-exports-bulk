@@ -871,10 +871,13 @@ sub get_contrast_assaygroup_details {
   foreach my $line (@assaygroupdetails) {
 
     # Split the line on tabs.
+    $logger->info( "Line in assaygroupdetails $line" );
+    
     my @splitLine = split "\t", $line;   #If there are any issues in parsing or missing factors for specific experiments, those experiments will be omitted
 
     # We just want the factor lines, so skip the other lines.
     # factor/characteristic is element 2.
+    $logger->info( "splitLine[2] $splitLine[2]" );
     unless($splitLine[2] eq "factor") { next };
 
     # If we're still here this must be a factor line, so save the details to the hash.
@@ -1007,6 +1010,8 @@ sub add_experiments_info {
   my ($writer, $H_experimentsInfo) = @_;
 
   foreach my $exptAcc (keys %{ $H_experimentsInfo }) {    # If there is an issue in gathering metadata for some experiment accessions ($H_experimentsInfo), those entries might be skipped in the output
+
+    $logger->info( "exptAcc $exptAcc" );
     # Start the entry for this experiment.
     # Add the accession as the "id".
     $writer->startTag("entry", "id" => $exptAcc);
