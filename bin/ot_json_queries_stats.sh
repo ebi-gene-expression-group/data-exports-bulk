@@ -53,7 +53,7 @@ json_dump_stats(){
   exp=$(cat $file_contrast | awk -F"  " '{print $2}' | grep  -oe 'E-[[:upper:]]*-[[:digit:]]*' | sort -u)
   for expAcc in $exp; do
     contrast=$(cat $file_contrast | grep "$expAcc" | awk -F"  " '{print $1}' | sort -u)
-    for cont in $(echo -e $contrast | tr "\"" "\n" | sed '/^$/d'); do
+    for cont in $(echo -e $contrast | sed 's/\\"/'\''/g' | tr "\"" "\n" | sed '/^$/d'); do
       ngenes=$(cat $file_contrast | grep "$expAcc" | grep -F "$cont" | wc -l)
       echo -e "$expAcc\t$cont\t$ngenes"
     done
