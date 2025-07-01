@@ -43,7 +43,7 @@ listExperimentsToRetrieve(){
       <( curl -s "$atlasUrl/json/experiments" | jq -c -r '.experiments | map(select(.species == "Homo sapiens")) | map(select((.experimentType | test("(MICROARRAY)|(DIFFERENTIAL)"; "i")) and (.rawExperimentType != "PROTEOMICS_DIFFERENTIAL"))) | map(.experimentAccession) | @csv' | tr -s ',' '\n' | sed 's/"//g' \
         | sort -u ) \
       <( cut -f1 -d ' ' "experiments-exclude.tmp" | sort) \ 
-      | head 
+      | head -n 5
 }
 
 rm -rf ${destination}.tmp
