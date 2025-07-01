@@ -42,7 +42,8 @@ listExperimentsToRetrieve(){
     comm -23 \
       <( curl -s "$atlasUrl/json/experiments" | jq -c -r '.experiments | map(select(.species == "Homo sapiens")) | map(select((.experimentType | test("(MICROARRAY)|(DIFFERENTIAL)"; "i")) and (.rawExperimentType != "PROTEOMICS_DIFFERENTIAL"))) | map(.experimentAccession) | @csv' | tr -s ',' '\n' | sed 's/"//g' \
         | sort -u ) \
-      <( cut -f1 -d ' ' "experiments-exclude.tmp" | sort)
+      <( cut -f1 -d ' ' "experiments-exclude.tmp" | sort) \ 
+      | head 
 }
 
 rm -rf ${destination}.tmp
@@ -88,7 +89,7 @@ while read -r experimentAccession ; do
     echo "WARN: $experimentAccession.tmp.json empty response"
     rm -f "$experimentAccession.tmp.json"
   fi
-done <<<"E-GEOD-10746 E-CURD-45 E-ENAD-28" #$(listExperimentsToRetrieve)
+done <<<$(listExperimentsToRetrieve)
 
 # Actually exit if the while read loop hasn't exited successfully
 if [ -n "$failed_exps" ]; then
