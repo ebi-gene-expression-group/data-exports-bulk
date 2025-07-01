@@ -88,7 +88,7 @@ while read -r experimentAccession ; do
     echo "WARN: $experimentAccession.tmp.json empty response"
     rm -f "$experimentAccession.tmp.json"
   fi
-done <<<$(listExperimentsToRetrieve)
+done <<<"E-GEOD-10746 E-CURD-45 E-ENAD-28" #$(listExperimentsToRetrieve)
 
 # Actually exit if the while read loop hasn't exited successfully
 if [ -n "$failed_exps" ]; then
@@ -104,12 +104,12 @@ echo "Sanity check .."
 $scriptDir/ot_json_queries_stats.sh -j ${destination} -o $outputPath
 
 # filter out based on biotypes
-json_to_process=${destination}.
+json_to_process=${destination}
 ensembl_genes=$ATLAS_PROD/bioentity_properties/annotations/ensembl/homo_sapiens.ensgene.tsv
 excluded_biotypes=$scriptDir/../data/excluded_biotypes.txt
 json_filtered=$( echo $json_to_process | sed s/.json/.filtered/ )".json"
 
-echo "JON filtering .."
+echo "JSON filtering .."
 $scriptDir/run_json_filtering.sh $json_to_process $ensembl_genes $excluded_biotypes > $json_filtered
 
 # transform to new schema
