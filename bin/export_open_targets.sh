@@ -115,8 +115,8 @@ $scriptDir/run_json_filtering.sh $json_to_process $ensembl_genes $excluded_bioty
 # transform to new schema
 export INPUT_JSON=$json_filtered
 export SCHEMA_TRANSFORM=$scriptDir/../data/schema_transform.jslt
-export PROCESSED_JSON=$( echo $INPUT_JSON | sed s/.json/.transformed/ | basename )".json"
-export OUTPUT_DIR=$( dirname $json_filtered )
+export PROCESSED_JSON=$(echo "$INPUT_JSON" | sed 's/\.json$/.transformed.json/')
+export OUTPUT_DIR=$(dirname "$json_filtered")
 export IMAGE_NAME=quay.io/ebigxa/json_schema_transform:latest
 
 echo "Transform to new schema .."
