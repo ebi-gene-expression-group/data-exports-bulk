@@ -7,8 +7,9 @@
 
 [ -z ${OUTPUT_DIR+x} ] && OUTPUT_DIR=$(pwd)/"outputs"
 [ ! -d $OUTPUT_DIR ] && mkdir $OUTPUT_DIR
-
 container=$1
+echo "run_schema_transform_container.sh here $container"
+
 if [ $container == "docker" ]; then
     docker run -v $INPUT_JSON:/data/input.json \
                -v $SCHEMA_TRANSFORM:/data/schema_transform.jslt \
@@ -16,10 +17,14 @@ if [ $container == "docker" ]; then
                -e PROCESSED_JSON=$PROCESSED_JSON \
                $IMAGE_NAME /src/run_schema_transform.sh
 elif [ $container == "singularity" ]; then
+    echo "run_schema_transform_container.sh elif here singularity"
+    
     singularity exec -B $INPUT_JSON:/data/input.json \
                -B $SCHEMA_TRANSFORM:/data/schema_transform.jslt \
                -B $OUTPUT_DIR:/data/outputs \
                docker://$IMAGE_NAME /src/run_schema_transform.sh
+
+    echo "run_schema_transform_container.sh elif here singularity done"
 else
     echo "Variable 'container' must be set to 'docker' or 'singularity', please provide one of them as first argument." && exit 1
 fi
