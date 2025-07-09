@@ -1,0 +1,5 @@
+---
+channels:
+  - conda-forge
+dependencies:
+  - google-cloud-sdk=405.0.0
