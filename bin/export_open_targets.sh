@@ -127,4 +127,4 @@ if [ -n "$failed_exps" ]; then
   exit 1
 fi
 echo "compressing .."
-bzip2 $OUTPUT_DIR/$PROCESSED_JSON
+xz $OUTPUT_DIR/$PROCESSED_JSON
