@@ -7,6 +7,14 @@
 
 [ -z ${OUTPUT_DIR+x} ] && OUTPUT_DIR=$(pwd)/"outputs"
 [ ! -d $OUTPUT_DIR ] && mkdir $OUTPUT_DIR
+
+
+echo "INPUT_JSON=$INPUT_JSON"
+echo "SCHEMA_TRANSFORM=$(pwd)/data/schema_transform.jslt"
+echo "PROCESSED_JSON=$PROCESSED_JSON"
+echo "IMAGE_NAME=$IMAGE_NAME"
+echo "OUTPUT_DIR=$OUTPUT_DIR"
+
 container=$1
 echo "run_schema_transform_container.sh here $container"
 
