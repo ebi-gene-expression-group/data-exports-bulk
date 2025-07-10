@@ -26,6 +26,8 @@ if [ $container == "docker" ]; then
                $IMAGE_NAME /src/run_schema_transform.sh
 elif [ $container == "singularity" ]; then
     echo "run_schema_transform_container.sh elif here singularity"
+
+    export PROCESSED_JSON=$PROCESSED_JSON
     
     singularity exec -B $INPUT_JSON:/data/input.json \
                -B $SCHEMA_TRANSFORM:/data/schema_transform.jslt \
