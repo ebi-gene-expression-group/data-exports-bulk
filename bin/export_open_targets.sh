@@ -113,18 +113,17 @@ echo "JSON filtering .."
 $scriptDir/run_json_filtering.sh $json_to_process $ensembl_genes $excluded_biotypes > $json_filtered
 
 # transform to new schema
-export INPUT_JSON=$json_filtered
-export SCHEMA_TRANSFORM=$scriptDir/../data/schema_transform.jslt
-export PROCESSED_JSON=$(echo "$INPUT_JSON" | sed 's/\.json$/.transformed.json/')
-export OUTPUT_DIR=$(dirname "$json_filtered")
-export IMAGE_NAME=quay.io/ebigxa/json_schema_transform:latest
+# export INPUT_JSON=$json_filtered
+# export SCHEMA_TRANSFORM=$scriptDir/../data/schema_transform.jslt
+# export PROCESSED_JSON=$(echo "$INPUT_JSON" | sed 's/\.json$/.transformed.json/')
+# export OUTPUT_DIR=$(dirname "$json_filtered")
+# export IMAGE_NAME=quay.io/ebigxa/json_schema_transform:latest
 
-echo "Transform to new schema .."
-$scriptDir/../run_schema_transform_container.sh singularity
+# echo "Transform to new schema .."
+# $scriptDir/../run_schema_transform_container.sh singularity
 
 if [ -n "$failed_exps" ]; then
-  echo "Files ready for inspection, there was a failure, so not compressing."
-  exit 1
+  echo "Files ready for inspection, there was a failure, so proceed with caution."
 fi
-echo "compressing .."
-xz $OUTPUT_DIR/$PROCESSED_JSON
+# echo "compressing .."
+# xz $OUTPUT_DIR/$PROCESSED_JSON
